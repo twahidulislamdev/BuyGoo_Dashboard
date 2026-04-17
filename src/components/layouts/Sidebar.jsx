@@ -11,8 +11,8 @@ import {
 
 const navItems = [
   { to: "/", icon: BarChart3, label: "Dashboard" },
-  { to: "/products", icon: Package, label: "Products" },
   { to: "/category", icon: Layers, label: "Category" },
+  { to: "/products", icon: Package, label: "Products" },
   { to: "/orders", icon: ShoppingCart, label: "Orders" },
   { to: "/customer", icon: Users, label: "Customers" },
 ];
