@@ -196,6 +196,7 @@ const ProductModal = ({ title, onClose, children }) => {
 
 // ================== Create Product Form Start Here ======================
 const CreateProductForm = ({ onCancel, onSuccess }) => {
+  // Form states
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -211,7 +212,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Get All Category for Craete Product
+  // Load categories from API
   useEffect(() => {
     axios
       .get("http://localhost:3000/user/v1/category/getallcategory")
@@ -502,6 +503,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
 
 // ================== Update Product Form Start Here ====================
 const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
+  // Form states - get initial values from product prop
   const [name, setName] = useState(product?.name || "");
   const [description, setDescription] = useState(product?.description || "");
   const [category, setCategory] = useState(product?.category || "");
@@ -517,7 +519,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Get All Category for Update Product
+  // Load categories from API
   useEffect(() => {
     axios
       .get("http://localhost:3000/user/v1/category/getallcategory")
@@ -804,13 +806,18 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
 
 // ---------- Main Products section Component Start Here ------------------
 const Products = () => {
-  const [modal, setModal] = useState(null); // "add" or null
-  const [updateModal, setUpdateModal] = useState(null); // product object or null
+  // Modal states
+  const [modal, setModal] = useState(null);
+  const [updateModal, setUpdateModal] = useState(null);
   const [refresh, setRefresh] = useState(0);
+
+  // Refresh function to reload products
   const triggerRefresh = () => setRefresh((prev) => prev + 1);
 
-  // ================ Get All Products Start Here ==============
+  // Products state
   const [products, setProducts] = useState([]);
+
+  // Load all products from API
   useEffect(() => {
     axios
       .get("http://localhost:3000/user/v1/product/getallproducts")
@@ -820,9 +827,8 @@ const Products = () => {
         toast.error("Failed to get products");
       });
   }, [refresh]);
-  // ================ Get All Products End Here ==============
 
-  // ================ Delete Product Start Here ==============
+  // Delete single product
   const deleteProduct = async (id) => {
     try {
       await axios.delete(
@@ -835,22 +841,22 @@ const Products = () => {
       toast.error("Failed to delete product");
     }
   };
-  // ================ Delete Product End Here ==============
 
-  // =========== Delete All Products start Here ===========
+  // Delete all products
   const deleteAllProducts = async () => {
     try {
       await axios.delete(
         `http://localhost:3000/user/v1/product/deleteallproducts`,
       );
       toast.success("All Products Deleted Successfully!");
-      triggerRefresh(); // ← refresh after delete all
+      triggerRefresh();
     } catch (error) {
       console.error("Delete All error:", error);
       toast.error("Failed To Delete All Products");
     }
   };
 
+  // Calculate stats
   const totalProducts = products.length;
   const activeProducts = products.filter(
     (p) => (p.status || "").toLowerCase() === "active",
