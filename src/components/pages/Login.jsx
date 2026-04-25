@@ -20,9 +20,8 @@ export default function Login() {
       return;
     }
     axios
-      .post("http://localhost:3000/user/v1/auth/login", {
-        email,
-        password,
+      .post("http://localhost:3000/user/v1/auth/login", loginFormData, {
+        withCredentials: true,
       })
       .then((res) => {
         if (res.data?.message?.includes("Error")) {

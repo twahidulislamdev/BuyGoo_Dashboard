@@ -527,7 +527,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
       .catch(() => toast.error("Failed to load categories"));
   }, []);
 
-  // Image
+  // Handle Image Change
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -615,7 +615,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
         </div>
       </div>
 
-      {/* 2. Basic Info */}
+      {/* 2. Basic Information */}
       <div>
         <SectionHeader step="2" label="Basic Information" />
         <div className="flex flex-col gap-3">

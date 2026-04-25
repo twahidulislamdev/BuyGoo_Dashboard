@@ -513,7 +513,7 @@ const CustomerList = () => {
         toast.success("Selected customers deleted");
       })
       .catch((err) =>
-        toast.error(err.response?.data?.message || "Bulk delete failed"),
+        toast.error(err.response?.data?.message || "Bulk Delete Failed"),
       );
   };
 
@@ -701,13 +701,13 @@ const CustomerList = () => {
                   <th className="px-4 py-3 text-center text-xs uppercase tracking-wider text-gray-500 font-semibold">
                     Orders
                   </th>
-                  <th className="px-4 py-3 text-right text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                  <th className="px-4 py-3 text-center text-xs uppercase tracking-wider text-gray-500 font-semibold">
                     Total spent
                   </th>
-                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                  <th className="px-4 py-3 text-center text-xs uppercase tracking-wider text-gray-500 font-semibold">
                     Joined
                   </th>
-                  <th className="px-4 py-3 text-left text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                  <th className="px-4 py-3 text-center text-xs uppercase tracking-wider text-gray-500 font-semibold">
                     Status
                   </th>
                   <th className="px-4 py-3 text-center text-xs uppercase tracking-wider text-gray-500 font-semibold">
@@ -726,59 +726,59 @@ const CustomerList = () => {
                     </td>
                   </tr>
                 ) : (
-                  getPageCustomers().map((c, idx) => (
+                  getPageCustomers().map((customer, idx) => (
                     <tr
-                      key={c.id}
+                      key={customer.id}
                       className="border-b border-gray-50 hover:bg-gray-50"
                     >
                       <td className="px-4 py-4 text-center">
                         <input
                           type="checkbox"
                           className="w-4 h-4 cursor-pointer accent-blue-600"
-                          checked={selectedIds.includes(c.id)}
-                          onChange={() => toggleRow(c.id)}
+                          checked={selectedIds.includes(customer.id)}
+                          onChange={() => toggleRow(customer.id)}
                         />
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          <Avatar name={c.name} index={idx} />
+                          <Avatar name={customer.name} index={idx} />
                           <div className="min-w-0">
                             <div className="font-semibold text-gray-900 text-sm truncate">
-                              {c.name}
+                              {customer.name}
                             </div>
                             <div className="text-xs text-gray-400 truncate">
-                              {c.email}
+                              {customer.email}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center text-sm text-gray-700">
-                        {c.orders}
+                        {customer.orders}
                       </td>
-                      <td className="px-4 py-4 text-right text-sm font-semibold text-gray-900">
-                        ${(c.spent || 0).toLocaleString()}
+                      <td className="px-4 py-4 text-center text-sm font-semibold text-gray-900">
+                        ${(customer.spent || 0).toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 text-sm text-gray-500">
-                        {c.joinedAt}
+                      <td className="px-4 py-4 text-center text-sm text-gray-500">
+                        {customer.joinedAt}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 text-center">
                         <span
-                          className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(c.status)}`}
+                          className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(customer.status)}`}
                         >
-                          {c.status?.charAt(0).toUpperCase() +
-                            c.status?.slice(1)}
+                          {customer.status?.charAt(0).toUpperCase() +
+                            customer.status?.slice(1)}
                         </span>
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center justify-center gap-2 cursor-pointer">
                           <button
-                            onClick={() => setEditCustomer(c)}
+                            onClick={() => setEditCustomer(customer)}
                             className="px-3 py-1.5 text-xs font-medium rounded-lg border border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 cursor-pointer"
                           >
                             Edit
                           </button>
                           <button
-                            onClick={() => handleDelete(c.id)}
+                            onClick={() => handleDelete(customer.id)}
                             className="px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 bg-red-50 text-red-500 hover:bg-red-100 
                             cursor-pointer"
                           >
