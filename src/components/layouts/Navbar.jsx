@@ -2,26 +2,15 @@ import axios from "axios";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bell, LogOut, LifeBuoy, KeyRound } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+// Change: Import useNavigate instead of Navigate
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/user/v1/auth/currentuser", {
-        withCredentials: true,
-      })
-      .then((res) => {
-        if (res.data.user) {
-          setCurrentUser(res.data.user);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch current user:", err);
-      });
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -42,6 +31,39 @@ const Navbar = () => {
       document.removeEventListener("keydown", handleEsc);
     };
   }, []);
+
+  // Fetch Admin Name Email With Avater for Display In Navbar
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/user/v1/auth/currentuser", {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.data.user) {
+          setCurrentUser(res.data.user);
+        }
+      });
+  }, []);
+
+  // Logout Functionality
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3000/user/v1/auth/logout",
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      setCurrentUser(null);
+      toast.success("Logged out successfully!");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      setCurrentUser(null);
+      toast.error("Session expired or error occurred. Redirecting...");
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200/70 shadow-sm">
@@ -81,7 +103,7 @@ const Navbar = () => {
                   ? `${currentUser.firstName} ${currentUser.lastName}`
                   : "Admin User"}
               </p>
-              <p className="text-sm text-slate-500 mt-1.5 leading-none">
+              <p className="text-xs text-slate-500 mt-1.5 leading-none">
                 {currentUser?.email || "admin@system.com"}
               </p>
             </div>
@@ -95,7 +117,7 @@ const Navbar = () => {
 
           {/* Dropdown */}
           {isProfileOpen && (
-            <div className="absolute right-0 top-full mt-3 w-[310px] mr-1 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute right-0 top-full mt-3 w-[310px] mr-1 bg-white rounded-xl border border-neutral-400 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
               <div className="py-1.5">
                 <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
                   <KeyRound size={16} className="text-slate-400" />
@@ -108,8 +130,11 @@ const Navbar = () => {
                 </button>
               </div>
 
-              <div className="border-t border-slate-100 ">
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+              <div className="border-t border-slate-100">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors  cursor-pointer"
+                >
                   <LogOut size={16} />
                   Sign Out
                 </button>
