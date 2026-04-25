@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "paths": { "@/*": ["./src/*"] },
+    "moduleResolution": "node",          // or "bundler" for modern tools
+    "resolveJsonModule": true,           // if you import JSON
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }
