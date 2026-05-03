@@ -215,7 +215,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
   // Load categories from API
   useEffect(() => {
     axios
-      .get("http://localhost:3000/user/v1/category/getallcategory")
+      .get("http://localhost:3000/api/v1/category/getallcategory")
       .then((res) => setCategories(res.data.categories || []))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
@@ -258,7 +258,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
     try {
       setLoading(true);
       await axios.post(
-        "http://localhost:3000/user/v1/product/createproduct",
+        "http://localhost:3000/api/v1/product/createproduct",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -522,7 +522,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   // Load categories from API
   useEffect(() => {
     axios
-      .get("http://localhost:3000/user/v1/category/getallcategory")
+      .get("http://localhost:3000/api/v1/category/getallcategory")
       .then((res) => setCategories(res.data.categories || []))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
@@ -561,7 +561,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     try {
       setLoading(true);
       await axios.patch(
-        `http://localhost:3000/user/v1/product/updateproduct/${product._id}`,
+        `http://localhost:3000/api/v1/product/updateproduct/${product._id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -820,7 +820,7 @@ const Products = () => {
   // Load all products from API
   useEffect(() => {
     axios
-      .get("http://localhost:3000/user/v1/product/getallproducts")
+      .get("http://localhost:3000/api/v1/product/getallproducts")
       .then((res) => setProducts(res.data.products || []))
       .catch((err) => {
         console.error(err);
@@ -832,7 +832,7 @@ const Products = () => {
   const deleteProduct = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:3000/user/v1/product/deletesingleproduct/${id}`,
+        `http://localhost:3000/api/v1/product/deletesingleproduct/${id}`,
       );
       toast.success("Product deleted successfully!");
       triggerRefresh();
@@ -846,7 +846,7 @@ const Products = () => {
   const deleteAllProducts = async () => {
     try {
       await axios.delete(
-        `http://localhost:3000/user/v1/product/deleteallproducts`,
+        `http://localhost:3000/api/v1/product/deleteallproducts`,
       );
       toast.success("All Products Deleted Successfully!");
       triggerRefresh();

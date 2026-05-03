@@ -11,7 +11,7 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/user/v1/auth/getme", {
+      .get("http://localhost:3000/api/v1/auth/getme", {
         withCredentials: true,
       })
       .then((res) => {

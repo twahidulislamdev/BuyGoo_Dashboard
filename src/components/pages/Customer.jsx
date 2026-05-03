@@ -90,7 +90,7 @@ const EditModal = ({ customer, onClose, onSave }) => {
     e.preventDefault();
     setSaving(true);
     axios
-      .post("http://localhost:3000/user/v1/auth/edituser", {
+      .post("http://localhost:3000/api/v1/auth/edituser", {
         email: form.email,
         firstName: form.firstName,
         lastName: form.lastName,
@@ -248,7 +248,7 @@ const AddModal = ({ onClose, onAdd }) => {
     e.preventDefault();
     setSaving(true);
     axios
-      .post("http://localhost:3000/user/v1/auth/addnewuser", {
+      .post("http://localhost:3000/api/v1/auth/addnewuser", {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
@@ -405,7 +405,7 @@ const CustomerList = () => {
   // Get all customers on component mount
   useEffect(() => {
     axios
-      .get("http://localhost:3000/user/v1/auth/getallusers")
+      .get("http://localhost:3000/api/v1/auth/getallusers")
       .then((res) => {
         const formatted = (res.data.users || []).map((user) => ({
           ...user,
@@ -486,7 +486,7 @@ const CustomerList = () => {
     const customer = customers.find((c) => c.id === id);
     if (!customer) return;
     axios
-      .post("http://localhost:3000/user/v1/auth/deleteuser", {
+      .post("http://localhost:3000/api/v1/auth/deleteuser", {
         email: customer.email,
       })
       .then(() => {
@@ -502,7 +502,7 @@ const CustomerList = () => {
   //=============== Delete All Selected Customers ================
   const handleDeleteSelected = () => {
     axios
-      .post("http://localhost:3000/user/v1/auth/deleteallusers", {
+      .post("http://localhost:3000/api/v1/auth/deleteallusers", {
         emails: customers
           .filter((c) => selectedIds.includes(c.id))
           .map((c) => c.email),

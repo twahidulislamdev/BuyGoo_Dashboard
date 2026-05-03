@@ -35,7 +35,7 @@ const CategoryModalForm = ({ onCancel, onSuccess }) => {
   const handleCreateCategory = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/user/v1/category/createcategory",
+        "http://localhost:3000/api/v1/category/createcategory",
         {
           name: categoryName,
           slug: categorySlug,
@@ -192,7 +192,7 @@ const UpdateCategoryModalForm = ({ onCancel, onSuccess, category }) => {
   const handleUpdateCategory = async () => {
     try {
       await axios.put(
-        `http://localhost:3000/user/v1/category/updatecategory/${category._id}`,
+        `http://localhost:3000/api/v1/category/updatecategory/${category._id}`,
         {
           name: formData.name,
           slug: formData.slug,
@@ -313,7 +313,7 @@ const Category = () => {
   // ================ Get All Categories Start Here ==============
   useEffect(() => {
     axios
-      .get("http://localhost:3000/user/v1/category/getallcategory")
+      .get("http://localhost:3000/api/v1/category/getallcategory")
       .then((res) => setCategories(res.data.categories || []))
       .catch((err) => {
         console.error(err);
@@ -326,7 +326,7 @@ const Category = () => {
   const deleteCategory = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:3000/user/v1/category/deletecategory/${id}`,
+        `http://localhost:3000/api/v1/category/deletecategory/${id}`,
       );
       toast.success("Category Deleted Successfully!");
       triggerRefresh(); // ← refresh after delete
@@ -341,7 +341,7 @@ const Category = () => {
   const deleteAllCategory = async () => {
     try {
       await axios.delete(
-        `http://localhost:3000/user/v1/category/deleteallcategory`,
+        `http://localhost:3000/api/v1/category/deleteallcategory`,
       );
       toast.success("All Categories Deleted Successfully!");
       triggerRefresh(); // ← refresh after delete all

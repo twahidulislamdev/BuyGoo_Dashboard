@@ -28,7 +28,7 @@ export default function Registation() {
 
     // Make API call to backend
     axios
-      .post("http://localhost:3000/user/v1/auth/signup", formData)
+      .post("http://localhost:3000/api/v1/auth/signup", formData)
       .then((res) => {
         // Check if response contains an error message
         if (res.data?.message?.includes("Error")) {
