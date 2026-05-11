@@ -54,99 +54,162 @@ const UploadIcon = () => (
 );
 
 // --------------- Color Picker
-const COLOR_PRESETS = [
-  { label: "Purple", hex: "#A855F7" },
-  { label: "Silver", hex: "#C0C0C0" },
-  { label: "Red", hex: "#EF4444" },
-  { label: "Black", hex: "#111111" },
-  { label: "Blue", hex: "#3B82F6" },
-  { label: "White", hex: "#FFFFFF" },
-  { label: "Gold", hex: "#D4AF37" },
-  { label: "Green", hex: "#22C55E" },
-];
 const ColorPicker = ({ selectedColors, onChange }) => {
-  const toggle = (label) => {
-    if (selectedColors.includes(label)) {
-      onChange(selectedColors.filter((c) => c !== label));
-    } else {
-      onChange([...selectedColors, label]);
+  const [colorName, setColorName] = useState("");
+  const [colorHex, setColorHex] = useState("#000000");
+
+  const addColor = () => {
+    const trimmedName = colorName.trim();
+    if (!trimmedName) return;
+
+    const alreadyExists = selectedColors.find(
+      (c) => c.name.toLowerCase() === trimmedName.toLowerCase(),
+    );
+
+    if (alreadyExists) {
+      toast.error("Color already exists");
+      return;
+    }
+
+    onChange([
+      ...selectedColors,
+      {
+        name: trimmedName,
+        hex: colorHex,
+      },
+    ]);
+
+    setColorName("");
+    setColorHex("#000000");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addColor();
     }
   };
 
+  const removeColor = (colorName) => {
+    onChange(selectedColors.filter((c) => c.name !== colorName));
+  };
+
   return (
-    <div className="flex flex-wrap gap-2 items-center">
-      {COLOR_PRESETS.map(({ label, hex }) => {
-        const selected = selectedColors.includes(label);
-        return (
-          <button
-            key={label}
-            type="button"
-            title={label}
-            onClick={() => toggle(label)}
-            className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 focus:outline-none ${
-              selected
-                ? "border-indigo-500 scale-110 ring-2 ring-indigo-300"
-                : "border-gray-300 hover:border-gray-400"
-            }`}
-            style={{ backgroundColor: hex }}
-          >
-            {selected && (
-              <span className="flex items-center justify-center w-full h-full">
-                <svg
-                  className={`w-3.5 h-3.5 ${hex === "#FFFFFF" || hex === "#C0C0C0" ? "text-gray-800" : "text-white"}`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-            )}
-          </button>
-        );
-      })}
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <input
+          type="text"
+          value={colorName}
+          onChange={(e) => setColorName(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="e.g. Midnight Black"
+          className="flex-1 border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-neutral-500 focus:bg-white transition"
+        />
+        <input
+          type="color"
+          value={colorHex}
+          onChange={(e) => setColorHex(e.target.value)}
+          className="w-14 h-11 rounded-lg border border-neutral-300 bg-white cursor-pointer p-1"
+        />
+        <button
+          type="button"
+          onClick={addColor}
+          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+        >
+          Add Color
+        </button>
+      </div>
+
       {selectedColors.length > 0 && (
-        <span className="text-xs text-gray-400 ml-1">
-          {selectedColors.join(", ")}
-        </span>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {selectedColors.map((color, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-medium border border-gray-200 shadow-sm"
+            >
+              <span
+                className="w-4 h-4 rounded-full border border-gray-300"
+                style={{ backgroundColor: color.hex }}
+              />
+              <span>{color.name}</span>
+              <span className="text-gray-500 uppercase">{color.hex}</span>
+              <button
+                type="button"
+                onClick={() => removeColor(color.name)}
+                className="w-4 h-4 rounded-full hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
 };
 
 // ------------- Size Picker
-const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
 const SizePicker = ({ selectedSizes, onChange }) => {
-  const toggle = (size) => {
-    if (selectedSizes.includes(size)) {
-      onChange(selectedSizes.filter((s) => s !== size));
-    } else {
-      onChange([...selectedSizes, size]);
+  const [inputValue, setInputValue] = useState("");
+
+  const addSize = () => {
+    const val = inputValue.trim();
+    if (val && !selectedSizes.includes(val)) {
+      onChange([...selectedSizes, val]);
+      setInputValue("");
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addSize();
+    }
+  };
+
+  const removeSize = (size) => {
+    onChange(selectedSizes.filter((s) => s !== size));
+  };
+
   return (
-    <div className="flex flex-wrap gap-2">
-      {SIZE_OPTIONS.map((s) => {
-        const selected = selectedSizes.includes(s);
-        return (
-          <button
-            key={s}
-            type="button"
-            onClick={() => toggle(s)}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-              selected
-                ? "bg-gray-900 border-gray-900 text-white"
-                : "bg-white border-gray-200 text-gray-600 hover:border-gray-400"
-            }`}
-          >
-            {s}
-          </button>
-        );
-      })}
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="e.g. 15.1 Inch, XL"
+          className="flex-1 border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-neutral-500 focus:bg-white transition"
+        />
+        <button
+          type="button"
+          onClick={addSize}
+          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+        >
+          Add Size
+        </button>
+      </div>
+
+      {selectedSizes.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-1">
+          {selectedSizes.map((size) => (
+            <div
+              key={size}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-medium border border-gray-200 shadow-sm"
+            >
+              <span>{size}</span>
+              <button
+                type="button"
+                onClick={() => removeSize(size)}
+                className="w-4 h-4 rounded-full hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -194,9 +257,8 @@ const ProductModal = ({ title, onClose, children }) => {
   );
 };
 
-// ================== Create Product Form Start Here ======================
+// ================== Create Product Form ======================
 const CreateProductForm = ({ onCancel, onSuccess }) => {
-  // Form states
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
@@ -212,7 +274,6 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load categories from API
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/v1/category/getallcategory")
@@ -229,16 +290,9 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
     reader.readAsDataURL(file);
   };
 
-  //--------- Create Product Logic Start Here ---------
   const handleCreateProduct = async () => {
-    if (
-      !name.trim() ||
-      !description.trim() ||
-      !category ||
-      price === "" ||
-      stock === ""
-    ) {
-      toast.error("Name, Description, Category, Price, and Stock are required");
+    if (!name.trim() || !category || price === "" || stock === "") {
+      toast.error("Name, Category, Price, and Stock are required");
       return;
     }
     const formData = new FormData();
@@ -254,29 +308,24 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
     formData.append("storage", storage);
     if (selectedFile) formData.append("image", selectedFile);
 
-    // Create Product Api
     try {
       setLoading(true);
       await axios.post(
         "http://localhost:3000/api/v1/product/createproduct",
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
       toast.success("Product created successfully!");
       onSuccess();
       onCancel();
     } catch (err) {
-      const msg = err.response?.data?.message || "Could not create product";
-      toast.error(msg);
+      toast.error(err.response?.data?.message || "Could not create product");
     } finally {
       setLoading(false);
     }
   };
 
-  const inputClass =
-    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-neutral-500 focus:bg-white transition";
+  const inputClass = "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 focus:bg-white transition";
 
   return (
     <div className="flex flex-col gap-6">
@@ -285,29 +334,13 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         <SectionHeader step="1" label="Media" />
         <div className="flex items-center gap-5">
           <div className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <ImageIcon />
-            )}
+            {imagePreview ? <img src={imagePreview} alt="preview" className="w-full h-full object-cover" /> : <ImageIcon />}
           </div>
           <div>
             <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition">
               <UploadIcon /> Upload Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
             </label>
-            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-              PNG or JPG · 800x800 px · Max 5 MB
-            </p>
           </div>
         </div>
       </div>
@@ -316,30 +349,11 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       <div>
         <SectionHeader step="2" label="Basic Information" />
         <div className="flex flex-col gap-3">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputClass}
-            placeholder="Product Name *"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className={`${inputClass} resize-none`}
-            placeholder="Description"
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={inputClass}
-          >
+          <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Product Name *" />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={`${inputClass} resize-none`} placeholder="Description" />
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputClass}>
             <option value="">Select a category...</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
+            {categories.map((cat) => (<option key={cat._id} value={cat.name}>{cat.name}</option>))}
           </select>
         </div>
       </div>
@@ -348,28 +362,8 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       <div>
         <SectionHeader step="3" label="Pricing & Inventory" />
         <div className="grid grid-cols-2 gap-3">
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-              $
-            </span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Price *"
-              className={`${inputClass} pl-8`}
-            />
-          </div>
-          <input
-            type="number"
-            min="0"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            placeholder="Stock *"
-            className={inputClass}
-          />
+          <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price *" className={inputClass} />
+          <input type="number" value={stock} onChange={(e) => setStock(e.target.value)} placeholder="Stock *" className={inputClass} />
         </div>
       </div>
 
@@ -378,15 +372,11 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         <SectionHeader step="4" label="Variants" />
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Colors
-            </label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Colors</label>
             <ColorPicker selectedColors={colors} onChange={setColors} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Sizes
-            </label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Sizes</label>
             <SizePicker selectedSizes={sizes} onChange={setSizes} />
           </div>
         </div>
@@ -396,47 +386,13 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       <div>
         <SectionHeader step="5" label="Specifications" />
         <div className="grid grid-cols-2 gap-3">
-          <select
-            value={ram}
-            onChange={(e) => setRam(e.target.value)}
-            className={inputClass}
-          >
+          <select value={ram} onChange={(e) => setRam(e.target.value)} className={inputClass}>
             <option value="">Select RAM...</option>
-            {[
-              "2 GB",
-              "4 GB",
-              "6 GB",
-              "8 GB",
-              "12 GB",
-              "16 GB",
-              "32 GB",
-              "64 GB",
-            ].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
+            {["2 GB", "4 GB", "8 GB", "16 GB", "32 GB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
-          <select
-            value={storage}
-            onChange={(e) => setStorage(e.target.value)}
-            className={inputClass}
-          >
+          <select value={storage} onChange={(e) => setStorage(e.target.value)} className={inputClass}>
             <option value="">Select Storage...</option>
-            {[
-              "16 GB",
-              "32 GB",
-              "64 GB",
-              "128 GB",
-              "256 GB",
-              "512 GB",
-              "1 TB",
-              "2 TB",
-            ].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
+            {["128 GB", "256 GB", "512 GB", "1 TB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
       </div>
@@ -445,65 +401,29 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       <div>
         <SectionHeader step="6" label="Status" />
         <div className="flex gap-3">
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              name="create_status"
-              value="active"
-              checked={status === "active"}
-              onChange={(e) => setStatus(e.target.value)}
-              className="accent-emerald-600"
-            />
-            <div>
-              <p className="text-sm font-semibold text-emerald-700">Active</p>
-              <p className="text-xs text-gray-400">Visible to customers</p>
-            </div>
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}>
+            <input type="radio" checked={status === "active"} onChange={() => setStatus("active")} className="accent-emerald-600" />
+            <p className="text-sm font-semibold text-emerald-700">Active</p>
           </label>
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition border-2 ${status === "inactive" ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              name="create_status"
-              value="inactive"
-              checked={status === "inactive"}
-              onChange={(e) => setStatus(e.target.value)}
-              className="accent-rose-600"
-            />
-            <div>
-              <p className="text-sm font-semibold text-rose-600">Inactive</p>
-              <p className="text-xs text-gray-400">Hidden from store</p>
-            </div>
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "inactive" ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}>
+            <input type="radio" checked={status === "inactive"} onChange={() => setStatus("inactive")} className="accent-rose-600" />
+            <p className="text-sm font-semibold text-rose-600">Inactive</p>
           </label>
         </div>
       </div>
 
-      {/* Buttons */}
       <div className="flex gap-3 pt-1">
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleCreateProduct}
-          disabled={loading}
-          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 transition cursor-pointer"
-        >
+        <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition">Cancel</button>
+        <button onClick={handleCreateProduct} disabled={loading} className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 transition">
           {loading ? "Saving..." : "Create Product"}
         </button>
       </div>
     </div>
   );
 };
-// ================== Create Product Form End Here ======================
 
-// ================== Update Product Form Start Here ====================
+// ================== Update Product Form ====================
 const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
-  // Form states - get initial values from product prop
   const [name, setName] = useState(product?.name || "");
   const [description, setDescription] = useState(product?.description || "");
   const [category, setCategory] = useState(product?.category || "");
@@ -519,15 +439,12 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load categories from API
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/v1/category/getallcategory")
-      .then((res) => setCategories(res.data.categories || []))
-      .catch(() => toast.error("Failed to load categories"));
+      .then((res) => setCategories(res.data.categories || []));
   }, []);
 
-  // Handle Image Change
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -538,12 +455,6 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   };
 
   const handleUpdateProduct = async () => {
-    if (!name.trim() || !category || price === "" || stock === "") {
-      toast.error("Name, Category, Price and Stock are required");
-      return;
-    }
-
-    // Form Data For Update Product
     const formData = new FormData();
     formData.append("name", name.trim());
     formData.append("description", description.trim());
@@ -557,29 +468,24 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     formData.append("storage", storage);
     if (selectedFile) formData.append("image", selectedFile);
 
-    // Update Product Logic
     try {
       setLoading(true);
       await axios.patch(
         `http://localhost:3000/api/v1/product/updateproduct/${product._id}`,
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
       toast.success("Product updated successfully!");
       onSuccess();
       onCancel();
     } catch (err) {
-      const msg = err.response?.data?.message || "Could not update product";
-      toast.error(msg);
+      toast.error(err.response?.data?.message || "Could not update product");
     } finally {
       setLoading(false);
     }
   };
 
-  const inputClass =
-    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-neutral-500 focus:bg-white transition";
+  const inputClass = "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 transition";
 
   return (
     <div className="flex flex-col gap-6">
@@ -588,61 +494,23 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
         <SectionHeader step="1" label="Media" />
         <div className="flex items-center gap-5">
           <div className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <ImageIcon />
-            )}
+            {imagePreview ? <img src={imagePreview} alt="preview" className="w-full h-full object-cover" /> : <ImageIcon />}
           </div>
-          <div>
-            <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition">
-              <UploadIcon /> Change Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-              PNG or JPG · 800x800 px · Max 5 MB
-            </p>
-          </div>
+          <label className="cursor-pointer px-4 py-2.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition">
+            Change Image
+            <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+          </label>
         </div>
       </div>
 
-      {/* 2. Basic Information */}
+      {/* 2. Basic Info */}
       <div>
         <SectionHeader step="2" label="Basic Information" />
         <div className="flex flex-col gap-3">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputClass}
-            placeholder="Product Name *"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className={`${inputClass} resize-none`}
-            placeholder="Description"
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select a category...</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
+          <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Name" />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={`${inputClass} resize-none`} placeholder="Description" />
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputClass}>
+            {categories.map((cat) => (<option key={cat._id} value={cat.name}>{cat.name}</option>))}
           </select>
         </div>
       </div>
@@ -651,28 +519,8 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
       <div>
         <SectionHeader step="3" label="Pricing & Inventory" />
         <div className="grid grid-cols-2 gap-3">
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-              $
-            </span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Price *"
-              className={`${inputClass} pl-8`}
-            />
-          </div>
-          <input
-            type="number"
-            min="0"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            placeholder="Stock *"
-            className={inputClass}
-          />
+          <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className={inputClass} />
+          <input type="number" value={stock} onChange={(e) => setStock(e.target.value)} placeholder="Stock" className={inputClass} />
         </div>
       </div>
 
@@ -680,18 +528,8 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
       <div>
         <SectionHeader step="4" label="Variants" />
         <div className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Colors
-            </label>
-            <ColorPicker selectedColors={colors} onChange={setColors} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Sizes
-            </label>
-            <SizePicker selectedSizes={sizes} onChange={setSizes} />
-          </div>
+          <ColorPicker selectedColors={colors} onChange={setColors} />
+          <SizePicker selectedSizes={sizes} onChange={setSizes} />
         </div>
       </div>
 
@@ -699,47 +537,13 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
       <div>
         <SectionHeader step="5" label="Specifications" />
         <div className="grid grid-cols-2 gap-3">
-          <select
-            value={ram}
-            onChange={(e) => setRam(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select RAM...</option>
-            {[
-              "2 GB",
-              "4 GB",
-              "6 GB",
-              "8 GB",
-              "12 GB",
-              "16 GB",
-              "32 GB",
-              "64 GB",
-            ].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
+          <select value={ram} onChange={(e) => setRam(e.target.value)} className={inputClass}>
+            <option value="">RAM...</option>
+            {["2 GB", "4 GB", "8 GB", "16 GB", "32 GB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
-          <select
-            value={storage}
-            onChange={(e) => setStorage(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select Storage...</option>
-            {[
-              "16 GB",
-              "32 GB",
-              "64 GB",
-              "128 GB",
-              "256 GB",
-              "512 GB",
-              "1 TB",
-              "2 TB",
-            ].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
+          <select value={storage} onChange={(e) => setStorage(e.target.value)} className={inputClass}>
+            <option value="">Storage...</option>
+            {["128 GB", "256 GB", "512 GB", "1 TB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
       </div>
@@ -748,124 +552,53 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
       <div>
         <SectionHeader step="6" label="Status" />
         <div className="flex gap-3">
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              name="update_status"
-              value="active"
-              checked={status === "active"}
-              onChange={(e) => setStatus(e.target.value)}
-              className="accent-emerald-600"
-            />
-            <div>
-              <p className="text-sm font-semibold text-emerald-700">Active</p>
-              <p className="text-xs text-gray-400">Visible to customers</p>
-            </div>
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}>
+            <input type="radio" checked={status === "active"} onChange={() => setStatus("active")} className="accent-emerald-600" />
+            <p className="text-sm font-semibold text-emerald-700">Active</p>
           </label>
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition border-2 ${status === "inactive" ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              name="update_status"
-              value="inactive"
-              checked={status === "inactive"}
-              onChange={(e) => setStatus(e.target.value)}
-              className="accent-rose-600"
-            />
-            <div>
-              <p className="text-sm font-semibold text-rose-600">Inactive</p>
-              <p className="text-xs text-gray-400">Hidden from store</p>
-            </div>
+          <label className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "inactive" ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}>
+            <input type="radio" checked={status === "inactive"} onChange={() => setStatus("inactive")} className="accent-rose-600" />
+            <p className="text-sm font-semibold text-rose-600">Inactive</p>
           </label>
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="flex gap-3 pt-1">
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleUpdateProduct}
-          disabled={loading}
-          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 transition cursor-pointer"
-        >
-          {loading ? "Saving..." : "Update Product"}
+      <div className="flex gap-3">
+        <button onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-sm font-semibold text-gray-500 hover:bg-gray-50">Cancel</button>
+        <button onClick={handleUpdateProduct} disabled={loading} className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60">
+          {loading ? "Updating..." : "Update Product"}
         </button>
       </div>
     </div>
   );
 };
-// ================== Update Product Form End Here ====================
 
-// ---------- Main Products section Component Start Here ------------------
+// ---------- Main Products Section ----------
 const Products = () => {
-  // Modal states
   const [modal, setModal] = useState(null);
   const [updateModal, setUpdateModal] = useState(null);
   const [refresh, setRefresh] = useState(0);
-
-  // Refresh function to reload products
-  const triggerRefresh = () => setRefresh((prev) => prev + 1);
-
-  // Products state
   const [products, setProducts] = useState([]);
 
-  // Load all products from API
+  const triggerRefresh = () => setRefresh((prev) => prev + 1);
+
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/v1/product/getallproducts")
       .then((res) => setProducts(res.data.products || []))
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to get products");
-      });
+      .catch(() => toast.error("Failed to get products"));
   }, [refresh]);
 
-  // Delete single product
   const deleteProduct = async (id) => {
+    if (!window.confirm("Delete this product?")) return;
     try {
-      await axios.delete(
-        `http://localhost:3000/api/v1/product/deletesingleproduct/${id}`,
-      );
-      toast.success("Product deleted successfully!");
+      await axios.delete(`http://localhost:3000/api/v1/product/deletesingleproduct/${id}`);
+      toast.success("Product deleted!");
       triggerRefresh();
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Failed to delete product");
-    }
+    } catch { toast.error("Delete failed"); }
   };
 
-  // Delete all products
-  const deleteAllProducts = async () => {
-    try {
-      await axios.delete(
-        `http://localhost:3000/api/v1/product/deleteallproducts`,
-      );
-      toast.success("All Products Deleted Successfully!");
-      triggerRefresh();
-    } catch (error) {
-      console.error("Delete All error:", error);
-      toast.error("Failed To Delete All Products");
-    }
-  };
-
-  // Calculate stats
-  const totalProducts = products.length;
-  const activeProducts = products.filter(
-    (p) => (p.status || "").toLowerCase() === "active",
-  ).length;
-  const outOfStock = products.filter((p) => (p.stock || 0) === 0).length;
-  const inventoryValue = products.reduce(
-    (sum, p) => sum + (p.price || 0) * (p.stock || 0),
-    0,
-  );
+  const inventoryValue = products.reduce((sum, p) => sum + (p.price || 0) * (p.stock || 0), 0);
 
   return (
     <>
@@ -874,245 +607,72 @@ const Products = () => {
           {/* Header */}
           <div className="flex justify-between items-center bg-white border-b border-gray-200 sticky top-0 z-10 pb-2 mb-5">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                Dashboard
-              </p>
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                Products
-              </h1>
-              <p className="text-sm text-gray-400 mt-1">
-                Manage your product listings, pricing, and inventory.
-              </p>
+              <p className="text-xs font-bold uppercase text-gray-400">Dashboard</p>
+              <h1 className="text-2xl font-bold text-gray-900">Products</h1>
             </div>
-            <button
-              onClick={() => setModal("add")}
-              className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-5 py-3.5 rounded-xl shadow-md transition cursor-pointer"
-            >
-              <span className="text-lg leading-none">+</span> Add Product
-            </button>
+            <button onClick={() => setModal("add")} className="bg-gray-900 text-white text-sm font-semibold px-5 py-3.5 rounded-xl shadow-md transition">+ Add Product</button>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-              <p className="text-sm font-medium text-gray-500">
-                Total Products
-              </p>
-              <p className="mt-3 text-3xl font-extrabold text-gray-900">
-                {totalProducts}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-              <p className="text-sm font-medium text-gray-500">
-                Active Products
-              </p>
-              <p className="mt-3 text-3xl font-extrabold text-emerald-600">
-                {activeProducts}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-              <p className="text-sm font-medium text-gray-500">Out of Stock</p>
-              <p className="mt-3 text-3xl font-extrabold text-rose-600">
-                {outOfStock}
-              </p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-              <p className="text-sm font-medium text-gray-500">
-                Inventory Value
-              </p>
-              <p className="mt-3 text-3xl font-extrabold text-gray-900">
-                ${inventoryValue.toLocaleString()}
-              </p>
-            </div>
+          <div className="grid grid-cols-4 gap-5 mb-8">
+            <div className="bg-white rounded-xl border p-6 shadow-sm"><p className="text-sm text-gray-500">Total</p><p className="mt-3 text-3xl font-extrabold">{products.length}</p></div>
+            <div className="bg-white rounded-xl border p-6 shadow-sm"><p className="text-sm text-gray-500">Inventory Value</p><p className="mt-3 text-3xl font-extrabold">${inventoryValue.toLocaleString()}</p></div>
           </div>
 
-          <div className="flex justify-between items-center bg-white border border-gray-100 rounded-2xl px-4 py-3 mb-5  gap-3 shadow-sm">
-            <div className="relative w-full sm:w-80">
-              <input
-                type="text"
-                placeholder="Search By Product Name..."
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-black"
-              />
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-
-            <button
-              onClick={deleteAllProducts}
-              className="px-5 py-2.5 rounded-xl bg-rose-100 border border-rose-300 text-rose-600 text-sm font-semibold hover:bg-rose-200 transition cursor-pointer whitespace-nowrap"
-            >
-              Delete All
-            </button>
-          </div>
-
-          {/* Table For Show All Data */}
+          {/* Table */}
           <div className="overflow-x-auto bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <table className="w-full table-fixed">
-              <colgroup>
-                <col className="w-16" />
-                <col className="w-1/4" />
-                <col className="w-1/6" />
-                <col className="w-1/8" />
-                <col className="w-1/8" />
-                <col className="w-1/8" />
-                <col className="w-1/8" />
-                <col className="w-1/8" />
-                <col className="w-1/8" />
-                <col className="w-1/5" />
-              </colgroup>
-              {/* Table Header Start */}
+            <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  {[
-                    "Image",
-                    "Name",
-                    "Category",
-                    "Color",
-                    "RAM",
-                    "Storage",
-                    "Price",
-                    "Stock",
-                    "Status",
-                    "Actions",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      className="text-left px-5 py-4 text-xs font-bold uppercase tracking-widest text-neutral-500"
-                    >
-                      {h}
-                    </th>
+                <tr className="border-b bg-gray-50">
+                  {["Image", "Name", "Category", "Colors", "RAM", "Price", "Stock", "Status", "Actions"].map((h) => (
+                    <th key={h} className="text-left px-5 py-4 text-xs font-bold uppercase text-neutral-500">{h}</th>
                   ))}
                 </tr>
               </thead>
-              {/* Table Header End */}
               <tbody className="divide-y divide-gray-50">
                 {products.map((item) => (
-                  <tr
-                    key={item._id}
-                    className="hover:bg-gray-50 transition duration-150"
-                  >
+                  <tr key={item._id} className="hover:bg-gray-50 transition">
+                    <td className="px-5 py-4"><img src={item.image} className="w-10 h-10 rounded-lg object-cover" alt="" /></td>
+                    <td className="px-5 py-4 text-sm font-semibold text-neutral-700">{item.name}</td>
+                    <td className="px-5 py-4 text-sm text-neutral-500">{item.category}</td>
+                    <td className="px-5 py-4 text-sm text-neutral-500">
+                        {/* FIX: Map the color objects to display names */}
+                        {Array.isArray(item.colors) ? item.colors.map(c => c.name).join(", ") : item.colors || "-"}
+                    </td>
+                    <td className="px-5 py-4 text-sm text-neutral-500">{item.ram || "-"}</td>
+                    <td className="px-5 py-4 text-sm font-mono">${item.price}</td>
+                    <td className="px-5 py-4 text-sm">{item.stock}</td>
                     <td className="px-5 py-4">
-                      <div className="w-10 h-10 rounded-lg border border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-center">
-                        {item.image ? (
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-gray-300 text-xs">-</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 text-neutral-700 font-semibold text-sm">
-                      {item.name}
-                    </td>
-                    <td className="px-5 py-4 text-neutral-500 text-sm">
-                      {item.category}
-                    </td>
-                    <td className="px-5 py-4 text-neutral-500 text-sm">
-                      {Array.isArray(item.colors)
-                        ? item.colors.join(", ")
-                        : item.colors || "-"}
-                    </td>
-                    <td className="px-5 py-4 text-neutral-500 text-sm">
-                      {item.ram || "-"}
-                    </td>
-                    <td className="px-5 py-4 text-neutral-500 text-sm">
-                      {item.storage || "-"}
-                    </td>
-                    <td className="px-5 py-4 text-neutral-700 font-mono text-sm">
-                      ${item.price}
-                    </td>
-                    <td className="px-5 py-4 text-neutral-500 text-sm">
-                      {item.stock != null ? item.stock : "-"}
-                    </td>
-                    <td className="px-5 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                          item.status?.toLowerCase() === "active"
-                            ? "bg-green-50 text-green-600 border border-green-200"
-                            : "bg-red-50 text-rose-600 border border-rose-200"
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${item.status?.toLowerCase() === "active" ? "bg-green-500" : "bg-rose-500"}`}
-                        />
-                        {item.status
-                          ? item.status.charAt(0).toUpperCase() +
-                            item.status.slice(1).toLowerCase()
-                          : ""}
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status?.toLowerCase() === "active" ? "bg-green-50 text-green-600" : "bg-red-50 text-rose-600"}`}>
+                        {item.status || "Inactive"}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setUpdateModal(item)}
-                          className="px-4 py-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-600 text-xs font-semibold hover:bg-amber-100 transition cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => deleteProduct(item._id)}
-                          className="px-4 py-2 rounded-lg bg-red-50 border border-rose-300 text-rose-600 text-xs font-semibold hover:bg-rose-100 transition cursor-pointer"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    <td className="px-5 py-4 flex gap-2">
+                      <button onClick={() => setUpdateModal(item)} className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-200 text-xs font-bold">Edit</button>
+                      <button onClick={() => deleteProduct(item._id)} className="px-3 py-1.5 rounded-lg bg-red-50 text-rose-600 border border-rose-200 text-xs font-bold">Delete</button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
-            {products.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-neutral-300">
-                <span className="text-4xl mb-3">📦</span>
-                <p className="text-sm font-medium">No products yet</p>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Create Modal */}
+      {/* Modals */}
       {modal === "add" && (
         <ProductModal title="Add New Product" onClose={() => setModal(null)}>
-          <CreateProductForm
-            onCancel={() => setModal(null)}
-            onSuccess={triggerRefresh}
-          />
+          <CreateProductForm onCancel={() => setModal(null)} onSuccess={triggerRefresh} />
         </ProductModal>
       )}
 
-      {/* Update Modal */}
       {updateModal && (
         <ProductModal title="Edit Product" onClose={() => setUpdateModal(null)}>
-          <UpdateProductForm
-            onCancel={() => setUpdateModal(null)}
-            onSuccess={triggerRefresh}
-            product={updateModal}
-          />
+          <UpdateProductForm onCancel={() => setUpdateModal(null)} onSuccess={triggerRefresh} product={updateModal} />
         </ProductModal>
       )}
 
-      <style>{`
-        @keyframes modalIn {
-          from { opacity: 0; transform: scale(0.97) translateY(8px); }
-          to   { opacity: 1; transform: scale(1) translateY(0); }
-        }
-      `}</style>
+      <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }`}</style>
     </>
   );
 };
