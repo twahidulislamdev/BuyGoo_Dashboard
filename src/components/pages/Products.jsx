@@ -388,11 +388,11 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         <div className="grid grid-cols-2 gap-3">
           <select value={ram} onChange={(e) => setRam(e.target.value)} className={inputClass}>
             <option value="">Select RAM...</option>
-            {["2 GB", "4 GB", "8 GB", "16 GB", "32 GB"].map((v) => <option key={v} value={v}>{v}</option>)}
+            {["2 GB", "4 GB", "8 GB","12 GB", "16 GB", "32 GB", "64 GB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
           <select value={storage} onChange={(e) => setStorage(e.target.value)} className={inputClass}>
             <option value="">Select Storage...</option>
-            {["128 GB", "256 GB", "512 GB", "1 TB"].map((v) => <option key={v} value={v}>{v}</option>)}
+            {["128 GB", "256 GB", "512 GB", "1 TB", "2 TB", "4 TB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
       </div>
@@ -439,6 +439,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  //fecth all category
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/v1/category/getallcategory")
@@ -454,6 +455,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     reader.readAsDataURL(file);
   };
 
+  // Update product function
   const handleUpdateProduct = async () => {
     const formData = new FormData();
     formData.append("name", name.trim());
@@ -539,11 +541,11 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
         <div className="grid grid-cols-2 gap-3">
           <select value={ram} onChange={(e) => setRam(e.target.value)} className={inputClass}>
             <option value="">RAM...</option>
-            {["2 GB", "4 GB", "8 GB", "16 GB", "32 GB"].map((v) => <option key={v} value={v}>{v}</option>)}
+            {["2 GB", "4 GB", "8 GB", "12 GB", "16 GB", "32 GB", "64 GB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
           <select value={storage} onChange={(e) => setStorage(e.target.value)} className={inputClass}>
             <option value="">Storage...</option>
-            {["128 GB", "256 GB", "512 GB", "1 TB"].map((v) => <option key={v} value={v}>{v}</option>)}
+            {["32 GB", "64 GB", "128 GB", "256 GB", "512 GB", "1 TB", "2 TB", "4 TB"].map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
       </div>
