@@ -20,7 +20,7 @@ export default function Login() {
       return;
     }
     axios
-      .post("http://localhost:3000/api/v1/auth/login", loginFormData, {
+      .post("https://buygoo-backend.onrender.com/api/v1/auth/login", loginFormData, {
         withCredentials: true,
       })
       .then((res) => {
@@ -30,10 +30,8 @@ export default function Login() {
         } else {
           toast.success("Login successful!");
           // You can also store the token in localStorage or context here
-          setTimeout(() => {
-            toast.dismiss();
-            navigate("/");
-          }, 1500);
+          toast.dismiss();
+          navigate("/");
         }
       })
       .catch(() => {
