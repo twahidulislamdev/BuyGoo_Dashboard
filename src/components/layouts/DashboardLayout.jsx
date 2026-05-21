@@ -7,31 +7,20 @@ import axios from "axios";
 const DashboardLayout = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     axios
-      .get("https://buygoo-backend.onrender.com/api/v1/auth/getme", {
+      .get("http://localhost:3000/api/v1/auth/getme", {
         withCredentials: true,
       })
       .then((res) => {
         setUser(res.data);
-        setIsLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching user data:", err);
         navigate("/login");
       });
   }, [navigate]);
-
-  // FIX: Prevent rendering UI components while the user is being fetched
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen bg-muted/40">

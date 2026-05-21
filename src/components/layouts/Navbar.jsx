@@ -35,7 +35,7 @@ const Navbar = () => {
   // Fetch Admin Name Email With Avater for Display In Navbar
   useEffect(() => {
     axios
-      .get("https://buygoo-backend.onrender.com/api/v1/auth/currentuser", {
+      .get("http://localhost:3000/api/v1/auth/currentuser", {
         withCredentials: true,
       })
       .then((res) => {
@@ -49,7 +49,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "https://buygoo-backend.onrender.com/api/v1/auth/logout",
+        "http://localhost:3000/api/v1/auth/logout",
         {},
         {
           withCredentials: true,

@@ -20,7 +20,7 @@ export default function Login() {
       return;
     }
     axios
-      .post("https://buygoo-backend.onrender.com/api/v1/auth/login", loginFormData, {
+      .post("http://localhost:3000/api/v1/auth/login", loginFormData, {
         withCredentials: true,
       })
       .then((res) => {
