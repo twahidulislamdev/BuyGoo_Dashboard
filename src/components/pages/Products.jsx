@@ -586,7 +586,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 transition";
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       {/* 1. Media */}
       <div>
         <SectionHeader step="1" label="Media" />
@@ -801,19 +801,19 @@ const Products = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-neutral-50 pb-12">
-        <div className="px-5 mx-auto">
+      <div className=" pb-5">
+        <div className="">
           {/* Header */}
-          <div className="flex justify-between items-center bg-white border-b border-gray-200 sticky top-0 z-10 pb-2 mb-5">
+          <div className="flex justify-between items-center sticky top-0 z-10 pb-2 mb-3">
             <div>
-              <p className="text-xs font-bold uppercase text-gray-400">
-                Dashboard
-              </p>
               <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+              <p className="text-xs font-bold uppercase text-gray-400">
+                Manage your product listings
+              </p>
             </div>
             <button
               onClick={() => setModal("add")}
-              className="bg-gray-900 text-white text-sm font-semibold px-5 py-3.5 rounded-xl shadow-md transition"
+              className="bg-gray-900 text-white text-sm font-semibold px-5 py-3.5 rounded-xl shadow-md transition cursor-pointer"
             >
               + Add Product
             </button>

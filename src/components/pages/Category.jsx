@@ -34,15 +34,12 @@ const CategoryModalForm = ({ onCancel, onSuccess }) => {
   //  Create Category Start Here
   const handleCreateCategory = async () => {
     try {
-      await axios.post(
-        "http://localhost:3000/api/v1/category/createcategory",
-        {
-          name: categoryName,
-          slug: categorySlug,
-          description: categoryDescription,
-          status: status.toLowerCase(),
-        },
-      );
+      await axios.post("http://localhost:3000/api/v1/category/createcategory", {
+        name: categoryName,
+        slug: categorySlug,
+        description: categoryDescription,
+        status: status.toLowerCase(),
+      });
       toast.success("Category Created Successfully!");
       onSuccess(); // ← trigger refresh
       onCancel();
@@ -319,7 +316,7 @@ const Category = () => {
         console.error(err);
         toast.error("Failed To Get Categories");
       });
-  }, [refresh]); // ← re-fetch whenever refresh changes
+  }, [refresh]);
   // ================ Get All Categories End Here ==============
 
   // ================ Delete Category Start Here ==============
@@ -353,14 +350,11 @@ const Category = () => {
   // ================ Delete All Categories End Here ==============
   return (
     <>
-      <div className="min-h-screen bg-neutral-50">
-        <div className="px-5 mx-auto">
+      <div className="">
+        <div className="min-h-screen">
           {/* Header */}
-          <div className="flex justify-between items-center bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10  pb-2 mb-5">
+          <div className="flex justify-between items-center sticky top-0 z-10 mb-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                Dashboard
-              </p>
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                 Categories
               </h1>

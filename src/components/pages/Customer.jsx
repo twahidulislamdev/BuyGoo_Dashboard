@@ -557,9 +557,9 @@ const CustomerList = () => {
     : "0.00";
 
   return (
-    <div className="min-h-screen bg-gray-50 px-5  font-sans text-gray-900">
+    <div className="min-h-screen bg-gray-50  font-sans text-gray-900">
       {/* Header */}
-      <div className="flex items-start justify-between mb-5">
+      <div className="flex items-start justify-between sticky top-0 z-10 mb-3">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Customers</h1>
           <p className="text-sm text-gray-400 mt-0.5">
@@ -577,7 +577,7 @@ const CustomerList = () => {
       {/* Loading */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-400">Loading customers...</div>
+          <div className="text-neutral-500">Loading customers...</div>
         </div>
       ) : (
         <>
