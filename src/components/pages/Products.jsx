@@ -4,7 +4,7 @@ import { Delete } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-// ── Icons ──
+//-------------- Icons -----------------
 const CloseIcon = () => (
   <svg
     className="w-4 h-4"
@@ -20,7 +20,7 @@ const CloseIcon = () => (
     />
   </svg>
 );
-
+// --------------- Image Icon -----------
 const ImageIcon = () => (
   <svg
     className="w-8 h-8 text-gray-300"
@@ -37,6 +37,7 @@ const ImageIcon = () => (
   </svg>
 );
 
+// -------------- Upload Icon -----------
 const UploadIcon = () => (
   <svg
     className="w-4 h-4"
@@ -53,7 +54,7 @@ const UploadIcon = () => (
   </svg>
 );
 
-// --------------- Color Picker
+// --------------- Color Picker ------------------
 const ColorPicker = ({ selectedColors, onChange }) => {
   const [colorName, setColorName] = useState("");
   const [colorHex, setColorHex] = useState("#000000");
@@ -114,7 +115,7 @@ const ColorPicker = ({ selectedColors, onChange }) => {
         <button
           type="button"
           onClick={addColor}
-          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap cursor-pointer"
         >
           Add Color
         </button>
@@ -185,7 +186,7 @@ const SizePicker = ({ selectedSizes, onChange }) => {
         <button
           type="button"
           onClick={addSize}
-          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap cursor-pointer"
         >
           Add Size
         </button>
@@ -257,7 +258,7 @@ const TagPicker = ({ selectedTags, onChange }) => {
         <button
           type="button"
           onClick={addTag}
-          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap cursor-pointer"
         >
           Add Tag
         </button>
@@ -274,7 +275,7 @@ const TagPicker = ({ selectedTags, onChange }) => {
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="w-4 h-4 rounded-full hover:bg-blue-200 flex items-center justify-center text-blue-600 hover:text-blue-700 transition-colors"
+                className="w-4 h-4 rounded-full flex items-center justify-center text-blue-600 hover:text-blue-700 transition-colors"
               >
                 <CloseIcon />
               </button>
@@ -403,9 +404,9 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       setLoading(false);
     }
   };
-
+  // Input Class for Custom Style
   const inputClass =
-    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 focus:bg-white transition";
+    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 focus:bg-white transition cursor-pointer";
 
   return (
     <div className="flex flex-col gap-6">
@@ -514,7 +515,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       <div>
         <SectionHeader step="5" label="Tags" />
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
+          <label className="block text-xs font-semibold text-gray-500 uppercase mb-2 cursor-pointer">
             Product Tags
           </label>
           <TagPicker selectedTags={tags} onChange={setTags} />
@@ -586,14 +587,14 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       <div className="flex gap-3 pt-1">
         <button
           onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition"
+          className="flex-1 py-2.5 rounded-xl border border-neutral-500 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition cursor-pointer"
         >
           Cancel
         </button>
         <button
           onClick={handleCreateProduct}
           disabled={loading}
-          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 transition"
+          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 transition cursor-pointer"
         >
           {loading ? "Saving..." : "Create Product"}
         </button>
@@ -869,9 +870,9 @@ const Products = () => {
   const [updateModal, setUpdateModal] = useState(null);
   const [refresh, setRefresh] = useState(0);
   const [products, setProducts] = useState([]);
-
   const triggerRefresh = () => setRefresh((prev) => prev + 1);
 
+  //=============== Get all products ===============
   useEffect(() => {
     axios
       .get("https://buygoo-backend.onrender.com/api/v1/product/getallproducts")
@@ -879,6 +880,7 @@ const Products = () => {
       .catch(() => toast.error("Failed to get products"));
   }, [refresh]);
 
+  // ============== Delete product function ==============
   const deleteProduct = async (id) => {
     if (!window.confirm("Delete this product?")) return;
     try {
@@ -917,7 +919,7 @@ const Products = () => {
             </button>
           </div>
 
-          {/* Stats Cards */}
+          {/* =============== Stats Cards ================= */}
           <div className="grid grid-cols-4 gap-5 mb-8">
             <div className="bg-white rounded-xl border p-6 shadow-sm">
               <p className="text-sm text-gray-500">Total</p>
@@ -931,7 +933,7 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Table */}
+          {/* =============== Product Table ================= */}
           <div className="overflow-x-auto bg-white rounded-2xl border border-gray-100 shadow-sm">
             <table className="w-full">
               <thead>
@@ -944,6 +946,7 @@ const Products = () => {
                     "RAM",
                     "Price",
                     "Stock",
+                    "Tags",
                     "Status",
                     "Actions",
                   ].map((h) => (
@@ -972,19 +975,37 @@ const Products = () => {
                     <td className="px-5 py-4 text-sm text-neutral-500">
                       {item.category}
                     </td>
+
+                    {/* Colors */}
                     <td className="px-5 py-4 text-sm text-neutral-500">
-                      {/* FIX: Map the color objects to display names */}
                       {Array.isArray(item.colors)
                         ? item.colors.map((c) => c.name).join(", ")
                         : item.colors || "-"}
                     </td>
+                    {/* RAM */}
                     <td className="px-5 py-4 text-sm text-neutral-500">
                       {item.ram || "-"}
                     </td>
+                    {/* Price */}
                     <td className="px-5 py-4 text-sm font-mono">
                       ${item.price}
                     </td>
+                    {/* Stock */}
                     <td className="px-5 py-4 text-sm">{item.stock}</td>
+                    {/* Tags */}
+                    <td className="px-5 py-4 text-sm">
+                      {item.tags && item.tags.length > 0
+                        ? item.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-block mr-2 px-2 py-1 text-start  text-xs font-semibold "
+                            >
+                              {tag}
+                            </span>
+                          ))
+                        : "-"}
+                    </td>
+                    {/* Status */}
                     <td className="px-5 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status?.toLowerCase() === "active" ? "bg-green-50 text-green-600" : "bg-red-50 text-rose-600"}`}
@@ -992,16 +1013,19 @@ const Products = () => {
                         {item.status || "Inactive"}
                       </span>
                     </td>
+
                     <td className="px-5 py-4 flex gap-2">
+                      {/* Edit Button */}
                       <button
                         onClick={() => setUpdateModal(item)}
-                        className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-200 text-xs font-bold"
+                        className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-200 text-xs font-bold cursor-pointer"
                       >
                         Edit
                       </button>
+                      {/* Delete Button */}
                       <button
                         onClick={() => deleteProduct(item._id)}
-                        className="px-3 py-1.5 rounded-lg bg-red-50 text-rose-600 border border-rose-200 text-xs font-bold"
+                        className="px-3 py-1.5 rounded-lg bg-red-50 text-rose-600 border border-rose-200 text-xs font-bold cursor-pointer"
                       >
                         Delete
                       </button>
