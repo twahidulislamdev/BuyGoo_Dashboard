@@ -1,58 +1,25 @@
 // src/pages/admin/Products.jsx
 import axios from "axios";
-import { Delete } from "lucide-react";
+import {
+  Delete,
+  ImagePlus,
+  Package,
+  Plus,
+  Sparkles,
+  Upload,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-//-------------- Icons -----------------
-const CloseIcon = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-);
-// --------------- Image Icon -----------
-const ImageIcon = () => (
-  <svg
-    className="w-8 h-8 text-gray-300"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-    />
-  </svg>
-);
+//-------------- Modal UI tokens -----------------
+const MODAL_INPUT_CLASS =
+  "w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10";
 
-// -------------- Upload Icon -----------
-const UploadIcon = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-    />
-  </svg>
-);
+const MODAL_PICKER_BTN_CLASS =
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 active:scale-[0.98] cursor-pointer";
+
+const CloseIcon = () => <X className="h-4 w-4" strokeWidth={2} />;
 
 // --------------- Color Picker ------------------
 const ColorPicker = ({ selectedColors, onChange }) => {
@@ -97,47 +64,58 @@ const ColorPicker = ({ selectedColors, onChange }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
         <input
           type="text"
           value={colorName}
           onChange={(e) => setColorName(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="e.g. Midnight Black"
-          className="flex-1 border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-neutral-500 focus:bg-white transition"
+          className={`${MODAL_INPUT_CLASS} min-w-[140px] flex-1`}
         />
-        <input
-          type="color"
-          value={colorHex}
-          onChange={(e) => setColorHex(e.target.value)}
-          className="w-14 h-11 rounded-lg border border-neutral-300 bg-white cursor-pointer p-1"
-        />
+        <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm">
+          <span
+            className="h-8 w-8 shrink-0 rounded-lg border border-gray-200 shadow-inner"
+            style={{ backgroundColor: colorHex }}
+          />
+          <input
+            type="color"
+            value={colorHex}
+            onChange={(e) => setColorHex(e.target.value)}
+            className="h-8 w-10 cursor-pointer rounded border-0 bg-transparent p-0"
+            aria-label="Pick color"
+          />
+        </div>
         <button
           type="button"
           onClick={addColor}
-          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap cursor-pointer"
+          className={MODAL_PICKER_BTN_CLASS}
         >
-          Add Color
+          <Plus className="h-3.5 w-3.5" />
+          Add
         </button>
       </div>
 
       {selectedColors.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-1">
+        <div className="flex flex-wrap gap-2">
           {selectedColors.map((color, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-medium border border-gray-200 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-2.5 text-xs font-medium text-gray-800 shadow-sm"
             >
               <span
-                className="w-4 h-4 rounded-full border border-gray-300"
+                className="h-4 w-4 rounded-full border border-gray-200 ring-2 ring-white"
                 style={{ backgroundColor: color.hex }}
               />
               <span>{color.name}</span>
-              <span className="text-gray-500 uppercase">{color.hex}</span>
+              <span className="font-mono text-[10px] uppercase text-gray-400">
+                {color.hex}
+              </span>
               <button
                 type="button"
                 onClick={() => removeColor(color.name)}
-                className="w-4 h-4 rounded-full hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label={`Remove ${color.name}`}
               >
                 <CloseIcon />
               </button>
@@ -174,36 +152,38 @@ const SizePicker = ({ selectedSizes, onChange }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="e.g. 15.1 Inch, XL"
-          className="flex-1 border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 placeholder-neutral-400 outline-none focus:border-neutral-500 focus:bg-white transition"
+          className={`${MODAL_INPUT_CLASS} min-w-[140px] flex-1`}
         />
         <button
           type="button"
           onClick={addSize}
-          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap cursor-pointer"
+          className={MODAL_PICKER_BTN_CLASS}
         >
-          Add Size
+          <Plus className="h-3.5 w-3.5" />
+          Add
         </button>
       </div>
 
       {selectedSizes.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-1">
+        <div className="flex flex-wrap gap-2">
           {selectedSizes.map((size) => (
             <div
               key={size}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full text-xs font-medium border border-gray-200 shadow-sm"
+              className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white py-1.5 pr-1.5 pl-3 text-xs font-medium text-gray-800 shadow-sm"
             >
               <span>{size}</span>
               <button
                 type="button"
                 onClick={() => removeSize(size)}
-                className="w-4 h-4 rounded-full hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label={`Remove size ${size}`}
               >
                 <CloseIcon />
               </button>
@@ -242,11 +222,11 @@ const TagPicker = ({ selectedTags, onChange }) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
         <select
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          className="flex-1 border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 focus:bg-white transition"
+          className={`${MODAL_INPUT_CLASS} min-w-[140px] flex-1 cursor-pointer`}
         >
           <option value="">Select a tag...</option>
           {availableTags.map((tag) => (
@@ -258,24 +238,26 @@ const TagPicker = ({ selectedTags, onChange }) => {
         <button
           type="button"
           onClick={addTag}
-          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap cursor-pointer"
+          className={MODAL_PICKER_BTN_CLASS}
         >
-          Add Tag
+          <Plus className="h-3.5 w-3.5" />
+          Add
         </button>
       </div>
 
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-1">
+        <div className="flex flex-wrap gap-2">
           {selectedTags.map((tag) => (
             <div
               key={tag}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium border border-blue-200 shadow-sm"
+              className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 py-1.5 pr-1.5 pl-3 text-xs font-semibold text-blue-800"
             >
               <span>{tag}</span>
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="w-4 h-4 rounded-full flex items-center justify-center text-blue-600 hover:text-blue-700 transition-colors"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-blue-500 transition hover:bg-blue-100 hover:text-blue-700"
+                aria-label={`Remove tag ${tag}`}
               >
                 <CloseIcon />
               </button>
@@ -288,51 +270,279 @@ const TagPicker = ({ selectedTags, onChange }) => {
 };
 // ------------- Tag Picker End ---------------------
 
-// --------------Section Header Start ----------------
+// ------------- Badge Picker Start ---------------------
+const BADGE_OPTIONS = [
+  { value: "Hot", label: "Hot🔥" },
+  { value: "New", label: "New✨" },
+  { value: "Limited", label: "Limited⏰" },
+  { value: "Sale", label: "Sale💰" },
+  { value: "Trending", label: "Trending📈" },
+  { value: "Best", label: "Best⭐" },
+];
+const getBadgeLabel = (value) =>
+  BADGE_OPTIONS.find((b) => b.value === value)?.label || value;
+
+const BadgePicker = ({ selectedBadge, onChange }) => {
+  const [inputValue, setInputValue] = useState("");
+
+  const addBadge = () => {
+    const val = inputValue.trim();
+    if (!val) return;
+    onChange(val);
+    setInputValue("");
+  };
+
+  const removeBadge = () => onChange("");
+
+  const badgeLabel = getBadgeLabel(selectedBadge);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <select
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          className={`${MODAL_INPUT_CLASS} min-w-[140px] flex-1 cursor-pointer`}
+        >
+          <option value="">Select a badge...</option>
+          {BADGE_OPTIONS.map((badge) => (
+            <option key={badge.value} value={badge.value}>
+              {badge.label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={addBadge}
+          className={MODAL_PICKER_BTN_CLASS}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add
+        </button>
+      </div>
+
+      {selectedBadge && (
+        <div className="flex flex-wrap gap-2">
+          <div className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 py-1.5 pr-1.5 pl-3 text-xs font-semibold text-purple-800">
+            <span>{badgeLabel}</span>
+            <button
+              type="button"
+              onClick={removeBadge}
+              className="flex h-6 w-6 items-center justify-center rounded-full text-purple-500 transition hover:bg-purple-100 hover:text-purple-700"
+              aria-label="Remove badge"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+// ------------- Badge Picker End ---------------------
+
+// -------------- Modal layout helpers ----------------
 const SectionHeader = ({ step, label }) => (
-  <div className="flex items-center gap-2.5 mb-4">
-    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold shrink-0">
+  <div className="mb-4 flex items-center gap-3">
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-[11px] font-bold text-white shadow-sm">
       {step}
     </span>
-    <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">
-      {label}
-    </span>
-    <div className="flex-1 h-px bg-gray-100" />
+    <div className="min-w-0">
+      <p className="text-sm font-semibold text-gray-900">{label}</p>
+    </div>
+    <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" />
   </div>
 );
-// --------------Section Header End ----------------
 
-// -------------- Product Modal Start -------------------
-const ProductModal = ({ title, onClose, children }) => {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div
-        className="w-full max-w-2xl max-h-[92vh] flex flex-col rounded-2xl bg-white shadow-2xl overflow-hidden"
-        style={{ animation: "modalIn .2s ease-out" }}
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">
-              Product Management
-            </p>
-            <h2 className="text-lg font-semibold text-gray-900 tracking-tight">
-              {title}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-neutral-100 text-neutral-900 hover:bg-neutral-200 transition cursor-pointer border border-neutral-300"
-          >
-            <CloseIcon />
-          </button>
+const FormSection = ({ children }) => (
+  <section className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 sm:p-5">
+    {children}
+  </section>
+);
+
+const FormField = ({ label, required, hint, children }) => (
+  <div className="flex flex-col gap-1.5">
+    {label && (
+      <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {label}
+        {required && <span className="ml-0.5 text-rose-500">*</span>}
+      </label>
+    )}
+    {children}
+    {hint && <p className="text-[11px] text-gray-400">{hint}</p>}
+  </div>
+);
+
+// ------------- Media Upload Zone ----------------
+const MediaUploadZone = ({ imagePreview, onImageChange, uploadLabel }) => (
+  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+    <div className="relative mx-auto h-36 w-36 shrink-0 overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-white shadow-inner sm:mx-0">
+      {imagePreview ? (
+        <img
+          src={imagePreview}
+          alt="Product preview"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-gray-300">
+          <ImagePlus className="h-9 w-9" strokeWidth={1.25} />
+          <span className="text-[10px] font-semibold uppercase tracking-wider">
+            No image
+          </span>
         </div>
-        <div className="overflow-y-auto flex-1 px-6 py-6">{children}</div>
+      )}
+    </div>
+    <div className="flex flex-1 flex-col items-center gap-2 text-center sm:items-start sm:text-left">
+      <p className="text-sm font-medium text-gray-800">Product image</p>
+      <p className="max-w-xs text-xs leading-relaxed text-gray-500">
+        Upload a clear square image. PNG or JPG recommended.
+      </p>
+      <label className="mt-1 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 active:scale-[0.98]">
+        <Upload className="h-4 w-4" />
+        {uploadLabel}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={onImageChange}
+          className="hidden"
+        />
+      </label>
+    </div>
+  </div>
+);
+//  ------------- Media Upload Zone End ----------------
+
+// ------------- Modal Footer ----------------
+const ModalFooter = ({
+  onCancel,
+  onSubmit,
+  loading,
+  submitLabel,
+  loadingLabel,
+}) => (
+  <div className="sticky bottom-0 z-10 -mx-6 -mb-6 mt-2 border-t border-gray-100 bg-white/95 px-6 py-4 backdrop-blur-sm">
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onCancel}
+        className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-sm font-semibold text-gray-600 shadow-sm transition hover:bg-gray-50 cursor-pointer"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={onSubmit}
+        disabled={loading}
+        className="flex-1 rounded-xl bg-gray-900 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+      >
+        {loading ? loadingLabel : submitLabel}
+      </button>
+    </div>
+  </div>
+);
+// ------------- Modal Footer End ----------------
+
+// ------------- Status Toggle ----------------
+const StatusToggle = ({ status, onChange }) => (
+  <div className="grid grid-cols-2 gap-3">
+    <label
+      className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition ${
+        status === "active"
+          ? "border-emerald-300 bg-emerald-50 shadow-sm"
+          : "border-gray-200 bg-white hover:border-gray-300"
+      }`}
+    >
+      <input
+        type="radio"
+        checked={status === "active"}
+        onChange={() => onChange("active")}
+        className="accent-emerald-600"
+      />
+      <div>
+        <p className="text-sm font-semibold text-emerald-800">Active</p>
+        <p className="text-[11px] text-emerald-600/80">Visible in store</p>
+      </div>
+    </label>
+    <label
+      className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3.5 transition ${
+        status === "inactive"
+          ? "border-rose-300 bg-rose-50 shadow-sm"
+          : "border-gray-200 bg-white hover:border-gray-300"
+      }`}
+    >
+      <input
+        type="radio"
+        checked={status === "inactive"}
+        onChange={() => onChange("inactive")}
+        className="accent-rose-600"
+      />
+      <div>
+        <p className="text-sm font-semibold text-rose-700">Inactive</p>
+        <p className="text-[11px] text-rose-600/80">Hidden from store</p>
+      </div>
+    </label>
+  </div>
+);
+
+// ================ Product Modal Start ===================
+const ProductModal = ({ title, onClose, children, mode = "create" }) => {
+  const isEdit = mode === "edit";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-gray-900/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-4">
+      <div
+        className="flex max-h-[94vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl border border-gray-200/80 bg-white shadow-2xl sm:rounded-3xl"
+        style={{ animation: "modalIn .22s cubic-bezier(0.16, 1, 0.3, 1)" }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="product-modal-title"
+      >
+        <div className="relative shrink-0 overflow-hidden border-b border-gray-100 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-6 py-5 text-white">
+          <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+          <div className="relative flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/20">
+                {isEdit ? (
+                  <Sparkles className="h-5 w-5" />
+                ) : (
+                  <Package className="h-5 w-5" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
+                  {isEdit ? "Edit listing" : "New listing"}
+                </p>
+                <h2
+                  id="product-modal-title"
+                  className="truncate text-xl font-semibold tracking-tight"
+                >
+                  {title}
+                </h2>
+                <p className="mt-1 text-xs text-white/70">
+                  Fill in the details below. Required fields are marked.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/20 transition hover:bg-white/20 cursor-pointer"
+              aria-label="Close modal"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+          {children}
+        </div>
       </div>
     </div>
   );
 };
+// ================ Product Modal End =====================
 
-// ================== Create Product Form ======================
+// ================== Create Product Form Start ======================
 const CreateProductForm = ({ onCancel, onSuccess }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -385,6 +595,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
     formData.append("colors", JSON.stringify(colors));
     formData.append("sizes", JSON.stringify(sizes));
     formData.append("tags", tags.join(", "));
+    formData.append("badge", badge);
     formData.append("ram", ram);
     formData.append("storage", storage);
     if (selectedFile) formData.append("image", selectedFile);
@@ -405,222 +616,171 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
       setLoading(false);
     }
   };
-  // Input Class for Custom Style
-  const inputClass =
-    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 focus:bg-white transition cursor-pointer";
-
   return (
-    <div className="flex flex-col gap-6">
-      {/* 1. Media */}
-      <div>
+    <div className="flex flex-col gap-5">
+      <FormSection>
         <SectionHeader step="1" label="Media" />
-        <div className="flex items-center gap-5">
-          <div className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <ImageIcon />
-            )}
-          </div>
-          <div>
-            <label className="inline-flex items-center gap-2 cursor-pointer px-4 py-2.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition">
-              <UploadIcon /> Upload Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-          </div>
-        </div>
-      </div>
+        <MediaUploadZone
+          imagePreview={imagePreview}
+          onImageChange={handleImageChange}
+          uploadLabel="Upload image"
+        />
+      </FormSection>
 
-      {/* 2. Basic Info */}
-      <div>
-        <SectionHeader step="2" label="Basic Information" />
-        <div className="flex flex-col gap-3">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputClass}
-            placeholder="Product Name *"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className={`${inputClass} resize-none`}
-            placeholder="Description"
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select a category...</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* 3. Pricing & Inventory */}
-      <div>
-        <SectionHeader step="3" label="Pricing & Inventory" />
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="Price *"
-            className={inputClass}
-          />
-          <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            placeholder="Stock *"
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      {/* 4. Variants */}
-      <div>
-        <SectionHeader step="4" label="Variants" />
+      <FormSection>
+        <SectionHeader step="2" label="Basic information" />
         <div className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
-              Colors
-            </label>
-            <ColorPicker selectedColors={colors} onChange={setColors} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
-              Sizes
-            </label>
-            <SizePicker selectedSizes={sizes} onChange={setSizes} />
-          </div>
-        </div>
-      </div>
-
-      {/* 5. Tags */}
-      <div>
-        <SectionHeader step="5" label="Tags" />
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase mb-2 cursor-pointer">
-            Product Tags
-          </label>
-          <TagPicker selectedTags={tags} onChange={setTags} />
-        </div>
-      </div>
-
-      {/* 6. Badge */}
-      <div>
-        <SectionHeader step="6" label="Badge" />
-        <select
-          value={badge}
-          onChange={(e) => setBadge(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select a badge (optional)...</option>
-          <option value="Hot">🔥 Hot</option>
-          <option value="New">✨ New</option>
-          <option value="Limited">⏰ Limited</option>
-          <option value="Sale">💰 Sale</option>
-          <option value="Trending">📈 Trending</option>
-          <option value="Best">⭐ Best</option>
-        </select>
-      </div>
-
-      {/* 7. Specifications */}
-      <div>
-        <SectionHeader step="7" label="Specifications" />
-        <div className="grid grid-cols-2 gap-3">
-          <select
-            value={ram}
-            onChange={(e) => setRam(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select RAM...</option>
-            {["2 GB", "4 GB", "8 GB", "12 GB", "16 GB", "32 GB", "64 GB"].map(
-              (v) => (
-                <option key={v} value={v}>
-                  {v}
+          <FormField label="Product name" required>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={MODAL_INPUT_CLASS}
+              placeholder="e.g. MacBook Pro 14"
+            />
+          </FormField>
+          <FormField label="Description">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className={`${MODAL_INPUT_CLASS} resize-none`}
+              placeholder="Short product description for customers"
+            />
+          </FormField>
+          <FormField label="Category" required>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={`${MODAL_INPUT_CLASS} cursor-pointer`}
+            >
+              <option value="">Select a category...</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>
+                  {cat.name}
                 </option>
-              ),
-            )}
-          </select>
-          <select
-            value={storage}
-            onChange={(e) => setStorage(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select Storage...</option>
-            {["128 GB", "256 GB", "512 GB", "1 TB", "2 TB", "4 TB"].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+              ))}
+            </select>
+          </FormField>
         </div>
-      </div>
+      </FormSection>
 
-      {/* 8. Status */}
-      <div>
-        <SectionHeader step="8" label="Status" />
-        <div className="flex gap-3">
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
-          >
+      <FormSection>
+        <SectionHeader step="3" label="Pricing & inventory" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label="Price" required>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">
+                $
+              </span>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0.00"
+                className={`${MODAL_INPUT_CLASS} pl-7`}
+              />
+            </div>
+          </FormField>
+          <FormField label="Stock" required>
             <input
-              type="radio"
-              checked={status === "active"}
-              onChange={() => setStatus("active")}
-              className="accent-emerald-600"
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              placeholder="Units available"
+              className={MODAL_INPUT_CLASS}
             />
-            <p className="text-sm font-semibold text-emerald-700">Active</p>
-          </label>
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "inactive" ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              checked={status === "inactive"}
-              onChange={() => setStatus("inactive")}
-              className="accent-rose-600"
-            />
-            <p className="text-sm font-semibold text-rose-600">Inactive</p>
-          </label>
+          </FormField>
         </div>
-      </div>
+      </FormSection>
 
-      <div className="flex gap-3 pt-1">
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-neutral-500 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleCreateProduct}
-          disabled={loading}
-          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 transition cursor-pointer"
-        >
-          {loading ? "Saving..." : "Create Product"}
-        </button>
-      </div>
+      <FormSection>
+        <SectionHeader step="4" label="Variants" />
+        <div className="flex flex-col gap-5">
+          <FormField
+            label="Colors"
+            hint="Add name and swatch for each color option"
+          >
+            <ColorPicker selectedColors={colors} onChange={setColors} />
+          </FormField>
+          <FormField label="Sizes">
+            <SizePicker selectedSizes={sizes} onChange={setSizes} />
+          </FormField>
+        </div>
+      </FormSection>
+
+      <FormSection>
+        <SectionHeader step="5" label="Tags & badge" />
+        <div className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start sm:gap-6">
+          <div className="min-w-0 flex-1">
+            <FormField label="Product tags">
+              <TagPicker selectedTags={tags} onChange={setTags} />
+            </FormField>
+          </div>
+          <div className="min-w-0 flex-1">
+            <FormField
+              label="Badge"
+              hint="Optional highlight shown on the product card"
+            >
+              <BadgePicker selectedBadge={badge} onChange={setBadge} />
+            </FormField>
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection>
+        <SectionHeader step="6" label="Specifications" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label="RAM">
+            <select
+              value={ram}
+              onChange={(e) => setRam(e.target.value)}
+              className={`${MODAL_INPUT_CLASS} cursor-pointer`}
+            >
+              <option value="">Select RAM...</option>
+              {["2 GB", "4 GB", "8 GB", "12 GB", "16 GB", "32 GB", "64 GB"].map(
+                (v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ),
+              )}
+            </select>
+          </FormField>
+          <FormField label="Storage">
+            <select
+              value={storage}
+              onChange={(e) => setStorage(e.target.value)}
+              className={`${MODAL_INPUT_CLASS} cursor-pointer`}
+            >
+              <option value="">Select storage...</option>
+              {["128 GB", "256 GB", "512 GB", "1 TB", "2 TB", "4 TB"].map(
+                (v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ),
+              )}
+            </select>
+          </FormField>
+        </div>
+      </FormSection>
+
+      <FormSection>
+        <SectionHeader step="7" label="Status" />
+        <StatusToggle status={status} onChange={setStatus} />
+      </FormSection>
+
+      <ModalFooter
+        onCancel={onCancel}
+        onSubmit={handleCreateProduct}
+        loading={loading}
+        submitLabel="Create product"
+        loadingLabel="Creating..."
+      />
     </div>
   );
 };
+// ================== Create Product Form End =======================
 
 // ================== Update Product Form ====================
 const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
@@ -691,220 +851,175 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     }
   };
 
-  // Input Class for Custom Style For Update Form
-  const inputClass =
-    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 transition cursor-pointer";
-
   return (
     <div className="flex flex-col gap-5">
-      {/* 1. Media */}
-      <div>
+      <FormSection>
         <SectionHeader step="1" label="Media" />
-        <div className="flex items-center gap-5">
-          <div className="shrink-0 w-24 h-24 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <ImageIcon />
-            )}
-          </div>
-          <label className="cursor-pointer px-4 py-2.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition">
-            Change Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-          </label>
-        </div>
-      </div>
+        <MediaUploadZone
+          imagePreview={imagePreview}
+          onImageChange={handleImageChange}
+          uploadLabel="Change image"
+        />
+      </FormSection>
 
-      {/* 2. Basic Info */}
-      <div>
-        <SectionHeader step="2" label="Basic Information" />
-        <div className="flex flex-col gap-3">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputClass}
-            placeholder="Name"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            className={`${inputClass} resize-none`}
-            placeholder="Description"
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={inputClass}
-          >
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* 3. Pricing & Inventory */}
-      <div>
-        <SectionHeader step="3" label="Pricing & Inventory" />
-        <div className="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="Price"
-            className={inputClass}
-          />
-          <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            placeholder="Stock"
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      {/* 4. Variants */}
-      <div>
-        <SectionHeader step="4" label="Variants" />
+      <FormSection>
+        <SectionHeader step="2" label="Basic information" />
         <div className="flex flex-col gap-4">
-          <ColorPicker selectedColors={colors} onChange={setColors} />
-          <SizePicker selectedSizes={sizes} onChange={setSizes} />
+          <FormField label="Product name" required>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={MODAL_INPUT_CLASS}
+              placeholder="Product name"
+            />
+          </FormField>
+          <FormField label="Description">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className={`${MODAL_INPUT_CLASS} resize-none`}
+              placeholder="Description"
+            />
+          </FormField>
+          <FormField label="Category" required>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={`${MODAL_INPUT_CLASS} cursor-pointer`}
+            >
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </FormField>
         </div>
-      </div>
+      </FormSection>
 
-      {/* 5. Tags */}
-      <div>
-        <SectionHeader step="5" label="Tags" />
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
-            Product Tags
-          </label>
-          <TagPicker selectedTags={tags} onChange={setTags} />
+      <FormSection>
+        <SectionHeader step="3" label="Pricing & inventory" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label="Price" required>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">
+                $
+              </span>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0.00"
+                className={`${MODAL_INPUT_CLASS} pl-7`}
+              />
+            </div>
+          </FormField>
+          <FormField label="Stock" required>
+            <input
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              placeholder="Stock"
+              className={MODAL_INPUT_CLASS}
+            />
+          </FormField>
         </div>
-      </div>
+      </FormSection>
 
-      {/* 6. Badge */}
-      <div>
-        <SectionHeader step="6" label="Badge" />
-        <select
-          value={badge}
-          onChange={(e) => setBadge(e.target.value)}
-          className={inputClass}
-        >
-          <option value="">Select a badge...</option>
-          <option value="Hot">Hot</option>
-          <option value="New">New</option>
-          <option value="Limited">Limited</option>
-          <option value="Sale">Sale</option>
-          <option value="Trending">Trending</option>
-          <option value="Best">Best</option>
-        </select>
-      </div>
+      <FormSection>
+        <SectionHeader step="4" label="Variants" />
+        <div className="flex flex-col gap-5">
+          <FormField label="Colors">
+            <ColorPicker selectedColors={colors} onChange={setColors} />
+          </FormField>
+          <FormField label="Sizes">
+            <SizePicker selectedSizes={sizes} onChange={setSizes} />
+          </FormField>
+        </div>
+      </FormSection>
 
-      {/* 7. Specifications */}
-      <div>
-        <SectionHeader step="7" label="Specifications" />
-        <div className="grid grid-cols-2 gap-3">
-          <select
-            value={ram}
-            onChange={(e) => setRam(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">RAM...</option>
-            {["2 GB", "4 GB", "8 GB", "12 GB", "16 GB", "32 GB", "64 GB"].map(
-              (v) => (
+      <FormSection>
+        <SectionHeader step="5" label="Tags & badge" />
+        <div className="flex flex-col gap-5 sm:flex-row sm:justify-between sm:items-start sm:gap-6">
+          <div className="min-w-0 flex-1">
+            <FormField label="Product tags">
+              <TagPicker selectedTags={tags} onChange={setTags} />
+            </FormField>
+          </div>
+          <div className="min-w-0 flex-1">
+            <FormField
+              label="Badge"
+              hint="Optional highlight shown on the product card"
+            >
+              <BadgePicker selectedBadge={badge} onChange={setBadge} />
+            </FormField>
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection>
+        <SectionHeader step="6" label="Specifications" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label="RAM">
+            <select
+              value={ram}
+              onChange={(e) => setRam(e.target.value)}
+              className={`${MODAL_INPUT_CLASS} cursor-pointer`}
+            >
+              <option value="">Select RAM...</option>
+              {["2 GB", "4 GB", "8 GB", "12 GB", "16 GB", "32 GB", "64 GB"].map(
+                (v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ),
+              )}
+            </select>
+          </FormField>
+          <FormField label="Storage">
+            <select
+              value={storage}
+              onChange={(e) => setStorage(e.target.value)}
+              className={`${MODAL_INPUT_CLASS} cursor-pointer`}
+            >
+              <option value="">Select storage...</option>
+              {[
+                "32 GB",
+                "64 GB",
+                "128 GB",
+                "256 GB",
+                "512 GB",
+                "1 TB",
+                "2 TB",
+                "4 TB",
+              ].map((v) => (
                 <option key={v} value={v}>
                   {v}
                 </option>
-              ),
-            )}
-          </select>
-          <select
-            value={storage}
-            onChange={(e) => setStorage(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Storage...</option>
-            {[
-              "32 GB",
-              "64 GB",
-              "128 GB",
-              "256 GB",
-              "512 GB",
-              "1 TB",
-              "2 TB",
-              "4 TB",
-            ].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+              ))}
+            </select>
+          </FormField>
         </div>
-      </div>
+      </FormSection>
 
-      {/* 6. Status */}
-      <div>
+      <FormSection>
         <SectionHeader step="7" label="Status" />
-        <div className="flex gap-3">
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              checked={status === "active"}
-              onChange={() => setStatus("active")}
-              className="accent-emerald-600"
-            />
-            <p className="text-sm font-semibold text-emerald-700">Active</p>
-          </label>
-          <label
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "inactive" ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}
-          >
-            <input
-              type="radio"
-              checked={status === "inactive"}
-              onChange={() => setStatus("inactive")}
-              className="accent-rose-600"
-            />
-            <p className="text-sm font-semibold text-rose-600">Inactive</p>
-          </label>
-        </div>
-      </div>
+        <StatusToggle status={status} onChange={setStatus} />
+      </FormSection>
 
-      <div className="flex gap-3">
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-neutral-500 text-sm font-semibold text-gray-500 hover:bg-gray-50 cursor-pointer transition"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleUpdateProduct}
-          disabled={loading}
-          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 cursor-pointer transition"
-        >
-          {loading ? "Updating..." : "Update Product"}
-        </button>
-      </div>
+      <ModalFooter
+        onCancel={onCancel}
+        onSubmit={handleUpdateProduct}
+        loading={loading}
+        submitLabel="Save changes"
+        loadingLabel="Updating..."
+      />
     </div>
   );
 };
 
-// ---------- Main Products Section ----------
+// ============== Main Products Section (Table) ===============
 const Products = () => {
   const [modal, setModal] = useState(null);
   const [updateModal, setUpdateModal] = useState(null);
@@ -1049,8 +1164,8 @@ const Products = () => {
                     {/* Badge */}
                     <td className="px-5 py-4">
                       {item.badge ? (
-                        <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold border border-purple-200">
-                          {item.badge}
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold">
+                          {getBadgeLabel(item.badge)}
                         </span>
                       ) : (
                         "-"
@@ -1059,7 +1174,7 @@ const Products = () => {
                     {/* Status */}
                     <td className="px-5 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status?.toLowerCase() === "active" ? "bg-green-50 text-green-600" : "bg-red-50 text-rose-600"}`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status?.toLowerCase() === "active" ? "bg-green-50 text-green-600 border border-green-200" : "bg-red-50 text-rose-600 border border-rose-200"}`}
                       >
                         {item.status || "Inactive"}
                       </span>
@@ -1091,7 +1206,11 @@ const Products = () => {
 
       {/* Modals */}
       {modal === "add" && (
-        <ProductModal title="Add New Product" onClose={() => setModal(null)}>
+        <ProductModal
+          title="Add new product"
+          mode="create"
+          onClose={() => setModal(null)}
+        >
           <CreateProductForm
             onCancel={() => setModal(null)}
             onSuccess={triggerRefresh}
@@ -1100,7 +1219,11 @@ const Products = () => {
       )}
 
       {updateModal && (
-        <ProductModal title="Edit Product" onClose={() => setUpdateModal(null)}>
+        <ProductModal
+          title="Edit product"
+          mode="edit"
+          onClose={() => setUpdateModal(null)}
+        >
           <UpdateProductForm
             onCancel={() => setUpdateModal(null)}
             onSuccess={triggerRefresh}
@@ -1109,7 +1232,12 @@ const Products = () => {
         </ProductModal>
       )}
 
-      <style>{`@keyframes modalIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }`}</style>
+      <style>{`
+        @keyframes modalIn {
+          from { opacity: 0; transform: translateY(12px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </>
   );
 };
