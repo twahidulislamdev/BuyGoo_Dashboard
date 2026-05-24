@@ -343,6 +343,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [tags, setTags] = useState([]);
+  const [badge, setBadge] = useState("");
   const [ram, setRam] = useState("");
   const [storage, setStorage] = useState("");
   const [imagePreview, setImagePreview] = useState("");
@@ -522,9 +523,27 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         </div>
       </div>
 
-      {/* 6. Specifications */}
+      {/* 6. Badge */}
       <div>
-        <SectionHeader step="6" label="Specifications" />
+        <SectionHeader step="6" label="Badge" />
+        <select
+          value={badge}
+          onChange={(e) => setBadge(e.target.value)}
+          className={inputClass}
+        >
+          <option value="">Select a badge (optional)...</option>
+          <option value="Hot">🔥 Hot</option>
+          <option value="New">✨ New</option>
+          <option value="Limited">⏰ Limited</option>
+          <option value="Sale">💰 Sale</option>
+          <option value="Trending">📈 Trending</option>
+          <option value="Best">⭐ Best</option>
+        </select>
+      </div>
+
+      {/* 7. Specifications */}
+      <div>
+        <SectionHeader step="7" label="Specifications" />
         <div className="grid grid-cols-2 gap-3">
           <select
             value={ram}
@@ -555,9 +574,9 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         </div>
       </div>
 
-      {/* 7. Status */}
+      {/* 8. Status */}
       <div>
-        <SectionHeader step="7" label="Status" />
+        <SectionHeader step="8" label="Status" />
         <div className="flex gap-3">
           <label
             className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
@@ -614,6 +633,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   const [colors, setColors] = useState(product?.colors || []);
   const [sizes, setSizes] = useState(product?.sizes || []);
   const [tags, setTags] = useState(product?.tags || []);
+  const [badge, setBadge] = useState(product?.badge || "");
   const [ram, setRam] = useState(product?.ram || "");
   const [storage, setStorage] = useState(product?.storage || "");
   const [imagePreview, setImagePreview] = useState(product?.image || "");
@@ -649,6 +669,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     formData.append("colors", JSON.stringify(colors));
     formData.append("sizes", JSON.stringify(sizes));
     formData.append("tags", tags.join(", "));
+    formData.append("badge", badge);
     formData.append("ram", ram);
     formData.append("storage", storage);
     if (selectedFile) formData.append("image", selectedFile);
@@ -670,8 +691,9 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     }
   };
 
+  // Input Class for Custom Style For Update Form
   const inputClass =
-    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 transition";
+    "w-full border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 transition cursor-pointer";
 
   return (
     <div className="flex flex-col gap-5">
@@ -774,9 +796,27 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
         </div>
       </div>
 
-      {/* 6. Specifications */}
+      {/* 6. Badge */}
       <div>
-        <SectionHeader step="6" label="Specifications" />
+        <SectionHeader step="6" label="Badge" />
+        <select
+          value={badge}
+          onChange={(e) => setBadge(e.target.value)}
+          className={inputClass}
+        >
+          <option value="">Select a badge...</option>
+          <option value="Hot">Hot</option>
+          <option value="New">New</option>
+          <option value="Limited">Limited</option>
+          <option value="Sale">Sale</option>
+          <option value="Trending">Trending</option>
+          <option value="Best">Best</option>
+        </select>
+      </div>
+
+      {/* 7. Specifications */}
+      <div>
+        <SectionHeader step="7" label="Specifications" />
         <div className="grid grid-cols-2 gap-3">
           <select
             value={ram}
@@ -848,14 +888,14 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
       <div className="flex gap-3">
         <button
           onClick={onCancel}
-          className="flex-1 py-2.5 rounded-xl border border-neutral-300 text-sm font-semibold text-gray-500 hover:bg-gray-50"
+          className="flex-1 py-2.5 rounded-xl border border-neutral-500 text-sm font-semibold text-gray-500 hover:bg-gray-50 cursor-pointer transition"
         >
           Cancel
         </button>
         <button
           onClick={handleUpdateProduct}
           disabled={loading}
-          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60"
+          className="flex-1 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 disabled:opacity-60 cursor-pointer transition"
         >
           {loading ? "Updating..." : "Update Product"}
         </button>
@@ -947,6 +987,7 @@ const Products = () => {
                     "Price",
                     "Stock",
                     "Tags",
+                    "Badge",
                     "Status",
                     "Actions",
                   ].map((h) => (
@@ -1004,6 +1045,16 @@ const Products = () => {
                             </span>
                           ))
                         : "-"}
+                    </td>
+                    {/* Badge */}
+                    <td className="px-5 py-4">
+                      {item.badge ? (
+                        <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold border border-purple-200">
+                          {item.badge}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                     {/* Status */}
                     <td className="px-5 py-4">
