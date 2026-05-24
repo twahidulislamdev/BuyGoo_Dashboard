@@ -215,6 +215,78 @@ const SizePicker = ({ selectedSizes, onChange }) => {
 };
 // ------------- Size Picker End ---------------------
 
+// ------------- Tag Picker Start ---------------------
+const TagPicker = ({ selectedTags, onChange }) => {
+  const [inputValue, setInputValue] = useState("");
+  const availableTags = ["New Arrivals", "Best Selling", "Top Trending"];
+
+  const addTag = () => {
+    const val = inputValue.trim();
+    if (val && !selectedTags.includes(val)) {
+      onChange([...selectedTags, val]);
+      setInputValue("");
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
+  const removeTag = (tag) => {
+    onChange(selectedTags.filter((t) => t !== tag));
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <select
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          className="flex-1 border border-neutral-300 bg-gray-50 rounded-lg px-3.5 py-2.5 text-sm text-neutral-800 outline-none focus:border-neutral-500 focus:bg-white transition"
+        >
+          <option value="">Select a tag...</option>
+          {availableTags.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={addTag}
+          className="px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+        >
+          Add Tag
+        </button>
+      </div>
+
+      {selectedTags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-1">
+          {selectedTags.map((tag) => (
+            <div
+              key={tag}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium border border-blue-200 shadow-sm"
+            >
+              <span>{tag}</span>
+              <button
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="w-4 h-4 rounded-full hover:bg-blue-200 flex items-center justify-center text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+// ------------- Tag Picker End ---------------------
+
 // --------------Section Header Start ----------------
 const SectionHeader = ({ step, label }) => (
   <div className="flex items-center gap-2.5 mb-4">
@@ -269,6 +341,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
   const [status, setStatus] = useState("active");
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
+  const [tags, setTags] = useState([]);
   const [ram, setRam] = useState("");
   const [storage, setStorage] = useState("");
   const [imagePreview, setImagePreview] = useState("");
@@ -309,6 +382,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
     formData.append("status", status);
     formData.append("colors", JSON.stringify(colors));
     formData.append("sizes", JSON.stringify(sizes));
+    formData.append("tags", tags.join(", "));
     formData.append("ram", ram);
     formData.append("storage", storage);
     if (selectedFile) formData.append("image", selectedFile);
@@ -436,9 +510,20 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         </div>
       </div>
 
-      {/* 5. Specifications */}
+      {/* 5. Tags */}
       <div>
-        <SectionHeader step="5" label="Specifications" />
+        <SectionHeader step="5" label="Tags" />
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
+            Product Tags
+          </label>
+          <TagPicker selectedTags={tags} onChange={setTags} />
+        </div>
+      </div>
+
+      {/* 6. Specifications */}
+      <div>
+        <SectionHeader step="6" label="Specifications" />
         <div className="grid grid-cols-2 gap-3">
           <select
             value={ram}
@@ -469,9 +554,9 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
         </div>
       </div>
 
-      {/* 6. Status */}
+      {/* 7. Status */}
       <div>
-        <SectionHeader step="6" label="Status" />
+        <SectionHeader step="7" label="Status" />
         <div className="flex gap-3">
           <label
             className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
@@ -527,6 +612,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   const [status, setStatus] = useState(product?.status || "active");
   const [colors, setColors] = useState(product?.colors || []);
   const [sizes, setSizes] = useState(product?.sizes || []);
+  const [tags, setTags] = useState(product?.tags || []);
   const [ram, setRam] = useState(product?.ram || "");
   const [storage, setStorage] = useState(product?.storage || "");
   const [imagePreview, setImagePreview] = useState(product?.image || "");
@@ -561,6 +647,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     formData.append("status", status);
     formData.append("colors", JSON.stringify(colors));
     formData.append("sizes", JSON.stringify(sizes));
+    formData.append("tags", tags.join(", "));
     formData.append("ram", ram);
     formData.append("storage", storage);
     if (selectedFile) formData.append("image", selectedFile);
@@ -675,9 +762,20 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
         </div>
       </div>
 
-      {/* 5. Specifications */}
+      {/* 5. Tags */}
       <div>
-        <SectionHeader step="5" label="Specifications" />
+        <SectionHeader step="5" label="Tags" />
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
+            Product Tags
+          </label>
+          <TagPicker selectedTags={tags} onChange={setTags} />
+        </div>
+      </div>
+
+      {/* 6. Specifications */}
+      <div>
+        <SectionHeader step="6" label="Specifications" />
         <div className="grid grid-cols-2 gap-3">
           <select
             value={ram}
@@ -719,7 +817,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
 
       {/* 6. Status */}
       <div>
-        <SectionHeader step="6" label="Status" />
+        <SectionHeader step="7" label="Status" />
         <div className="flex gap-3">
           <label
             className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer border-2 ${status === "active" ? "border-emerald-200 bg-emerald-50" : "border-gray-200 bg-white"}`}
