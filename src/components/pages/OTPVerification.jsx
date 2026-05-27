@@ -30,7 +30,7 @@ export default function OTPVerification() {
 
     // Verify OTP
     axios
-      .post("http://localhost:3000/api/v1/auth/otpverify", {
+      .post("http://localhost:3000/api/v1/admin/otpverify", {
         email,
         otp,
       })
@@ -85,7 +85,7 @@ export default function OTPVerification() {
     setIsResending(true);
 
     axios
-      .post("http://localhost:3000/api/v1/auth/resendotp", { email })
+      .post("http://localhost:3000/api/v1/admin/resendotp", { email })
       .then((res) => {
         const message = res.data?.message || "";
 

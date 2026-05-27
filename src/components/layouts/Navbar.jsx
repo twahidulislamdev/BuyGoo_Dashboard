@@ -43,7 +43,7 @@ const Navbar = () => {
   // Fetch Admin Name Email With Avatar for Display In Navbar
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/v1/auth/currentuser", {
+      .get("http://localhost:3000/api/v1/admin/currentuser", {
         withCredentials: true,
       })
       .then((res) => {
@@ -57,7 +57,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/api/v1/auth/logout",
+        "http://localhost:3000/api/v1/admin/logout",
         {},
         {
           withCredentials: true,
