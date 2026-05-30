@@ -1,4 +1,25 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const API_BASE = "http://localhost:3000/api/v1";
+
+const formatOrderFromApi = (order) => ({
+  id: `#${String(order._id).slice(-6).toUpperCase()}`,
+  _originalId: order._id,
+  customer: order.customer
+    ? `${order.customer.firstName} ${order.customer.lastName}`.trim()
+    : "Unknown",
+  product: order.items?.map((i) => i.title).join(", ") || "No items",
+  quantity: order.items?.reduce((acc, curr) => acc + curr.quantity, 0) || 0,
+  total: order.grandTotal || 0,
+  status: order.status || "pending",
+  date: new Date(order.createdAt).toISOString().split("T")[0],
+  time: new Date(order.createdAt).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  }),
+});
 import {
   Search,
   Package,
@@ -16,6 +37,7 @@ import {
   ArrowDownRight,
   Filter,
   Trash2,
+  ChevronDown,
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────
@@ -61,6 +83,18 @@ const STATUS = {
     pill: "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
     icon: XCircle,
   },
+  pending: {
+    label: "Pending",
+    dot: "bg-slate-400",
+    pill: "bg-slate-50 text-slate-700 ring-1 ring-slate-200",
+    icon: Clock,
+  },
+  paid: {
+    label: "Paid",
+    dot: "bg-blue-400",
+    pill: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+    icon: DollarSign,
+  }
 };
 
 /* ─────────────────────────────────────────────
@@ -123,7 +157,27 @@ export default function Orders() {
     status: "processing",
   };
 
-  const [orders, setOrders] = useState(SEED);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const fetchOrders = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/order`, { withCredentials: true });
+      if (res.data.success && Array.isArray(res.data.data)) {
+        setOrders(res.data.data.map(formatOrderFromApi));
+      }
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      toast.error("Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -143,7 +197,6 @@ export default function Orders() {
   /* STATS */
   const stats = useMemo(() => {
     const revenue = orders.reduce((acc, order) => acc + Number(order.total), 0);
-
     return [
       {
         label: "Total Orders",
@@ -202,7 +255,7 @@ export default function Orders() {
     });
   }, [orders, filter, search]);
 
-  const FILTERS = ["all", "processing", "shipped", "delivered", "cancelled"];
+  const FILTERS = ["all", "pending", "paid", "processing", "shipped", "delivered", "cancelled"];
 
   const counts = FILTERS.reduce(
     (acc, f) => ({
@@ -270,27 +323,45 @@ export default function Orders() {
   };
 
   /* UPDATE ORDER */
-  const handleUpdate = () => {
-    if (!validateForm()) return;
+  const handleUpdate = async () => {
+    if (!validateForm() || !selected?._originalId) return;
 
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === selected.id
-          ? {
-              ...o,
-              customer: form.customer,
-              product: form.product,
-              quantity: Number(form.quantity),
-              total: Number(form.total),
-              status: form.status,
-            }
-          : o,
-      ),
-    );
+    setSaving(true);
+    try {
+      const res = await axios.put(
+        `${API_BASE}/order/${selected._originalId}`,
+        {
+          status: form.status,
+          quantity: Number(form.quantity),
+          total: Number(form.total),
+          customer: form.customer,
+          product: form.product,
+        },
+        { withCredentials: true },
+      );
 
-    resetForm();
-    setSelected(null);
-    setShowUpdate(false);
+      if (res.data.success) {
+        const updated = formatOrderFromApi(res.data.data);
+        setOrders((prev) =>
+          prev.map((o) =>
+            String(o._originalId) === String(selected._originalId) ? updated : o,
+          ),
+        );
+        toast.success("Order updated successfully");
+        resetForm();
+        setSelected(null);
+        setShowUpdate(false);
+      } else {
+        toast.error(res.data.message || "Failed to update order");
+      }
+    } catch (err) {
+      console.error("Failed to update order:", err);
+      toast.error(
+        err?.response?.data?.message || "Failed to update order. Is the backend running?",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* DELETE ORDER */
@@ -316,9 +387,7 @@ export default function Orders() {
               Operations
             </span>
 
-            <h1 className="text-4xl font-extrabold text-slate-900 ">
-              Orders
-            </h1>
+            <h1 className="text-4xl font-extrabold text-slate-900 ">Orders</h1>
           </div>
 
           <button
@@ -540,7 +609,7 @@ export default function Orders() {
 
                         {/* TOTAL */}
                         <td className="px-5 py-4">
-                          <span className="text-base font-extrabold text-slate-900">
+                          <span className="text-base font-bold text-slate-900">
                             ${Number(order.total).toFixed(2)}
                           </span>
                         </td>
@@ -548,7 +617,7 @@ export default function Orders() {
                         {/* STATUS */}
                         <td className="px-5 py-4">
                           <span
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${cfg.pill}`}
+                            className={`w-[100px] inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold ${cfg.pill}`}
                           >
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`}
@@ -564,7 +633,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => openEdit(order)}
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-500 bg-blue-50  hover:bg-blue-100 transition-all cursor-pointer"
                             >
                               <Edit3 size={14} />
                             </button>
@@ -572,7 +641,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => handleDelete(order.id)}
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all"
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-500 bg-rose-50 hover:text-rose-500 hover:bg-rose-100 transition-all cursor-pointer"
                             >
                               <Trash2 size={14} />
                             </button>
@@ -655,7 +724,8 @@ export default function Orders() {
               setSelected(null);
               setShowUpdate(false);
             }}
-            label="Save Changes"
+            label={saving ? "Saving..." : "Save Changes"}
+            disabled={saving}
           />
         </Modal>
       )}
@@ -702,7 +772,7 @@ function Modal({ title, onClose, children }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"
+            className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 cursor-pointer"
           >
             <X size={14} />
           </button>
@@ -718,12 +788,53 @@ function Modal({ title, onClose, children }) {
    ORDER FORM
 ───────────────────────────────────────────── */
 
-function OrderForm({ form, setForm, onSubmit, onCancel, label }) {
-  const inputCls =
-    "w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-white text-sm ftext-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition";
+const ORDER_STATUS_OPTIONS = [
+  { value: "pending", label: "Pending", dot: "bg-slate-400" },
+  { value: "paid", label: "Paid", dot: "bg-blue-400" },
+  { value: "processing", label: "Processing", dot: "bg-amber-400" },
+  { value: "shipped", label: "Shipped", dot: "bg-indigo-400" },
+  { value: "delivered", label: "Delivered", dot: "bg-emerald-400" },
+  { value: "cancelled", label: "Cancelled", dot: "bg-rose-400" },
+];
 
-  const field = (label, node) => (
-    <div>
+function StatusSelect({ value, onChange, disabled }) {
+  const current =
+    ORDER_STATUS_OPTIONS.find((option) => option.value === value) ||
+    ORDER_STATUS_OPTIONS[0];
+
+  return (
+    <div className="relative w-full">
+      <span
+        className={`pointer-events-none absolute left-4 top-1/2 z-10 h-2.5 w-2.5 -translate-y-1/2 rounded-full ${current.dot}`}
+        aria-hidden
+      />
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="w-full h-12 cursor-pointer appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-8 pr-11 text-sm font-semibold text-slate-800 shadow-sm transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {ORDER_STATUS_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        className="pointer-events-none absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+        strokeWidth={2.25}
+        aria-hidden
+      />
+    </div>
+  );
+}
+
+function OrderForm({ form, setForm, onSubmit, onCancel, label, disabled = false }) {
+  const inputCls =
+    "w-full h-12 px-3.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition";
+
+  const field = (label, node, fullWidth = false) => (
+    <div className={fullWidth ? "w-full" : undefined}>
       <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
         {label}
       </label>
@@ -813,22 +924,13 @@ function OrderForm({ form, setForm, onSubmit, onCancel, label }) {
 
       {/* STATUS */}
       {field(
-        "Status",
-        <select
+        "Order Status",
+        <StatusSelect
           value={form.status}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              status: e.target.value,
-            })
-          }
-          className={inputCls + " cursor-pointer appearance-none"}
-        >
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-        </select>,
+          onChange={(status) => setForm({ ...form, status })}
+          disabled={disabled}
+        />,
+        true,
       )}
 
       {/* BUTTONS */}
@@ -844,8 +946,9 @@ function OrderForm({ form, setForm, onSubmit, onCancel, label }) {
 
         <button
           type="submit"
+          disabled={disabled}
           className="flex items-center gap-2 h-12 px-5 rounded-xl bg-slate-900
-           text-white text-sm font-bold hover:bg-slate-700 shadow-md shadow-slate-900/20"
+           text-white text-sm font-bold hover:bg-slate-700 shadow-md shadow-slate-900/20 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <Save size={13} />
           {label}
