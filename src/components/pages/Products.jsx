@@ -564,7 +564,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
   // Fetch All Categories
   useEffect(() => {
     axios
-      .get("https://buygoo-backend.onrender.com/api/v1/category/getallcategory")
+      .get("http://localhost:3000/api/v1/category/getallcategory")
       .then((res) => setCategories(res.data.categories || []))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
@@ -603,7 +603,7 @@ const CreateProductForm = ({ onCancel, onSuccess }) => {
     try {
       setLoading(true);
       await axios.post(
-        "https://buygoo-backend.onrender.com/api/v1/product/createproduct",
+        "http://localhost:3000/api/v1/product/createproduct",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
@@ -804,7 +804,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
   //fecth all category
   useEffect(() => {
     axios
-      .get("https://buygoo-backend.onrender.com/api/v1/category/getallcategory")
+      .get("http://localhost:3000/api/v1/category/getallcategory")
       .then((res) => setCategories(res.data.categories || []));
   }, []);
 
@@ -837,7 +837,7 @@ const UpdateProductForm = ({ onCancel, onSuccess, product }) => {
     try {
       setLoading(true);
       await axios.patch(
-        `https://buygoo-backend.onrender.com/api/v1/product/updateproduct/${product._id}`,
+        `http://localhost:3000/api/v1/product/updateproduct/${product._id}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
@@ -1030,7 +1030,7 @@ const Products = () => {
   //=============== Get all products ===============
   useEffect(() => {
     axios
-      .get("https://buygoo-backend.onrender.com/api/v1/product/getallproducts")
+      .get("http://localhost:3000/api/v1/product/getallproducts")
       .then((res) => setProducts(res.data.products || []))
       .catch(() => toast.error("Failed to get products"));
   }, [refresh]);
@@ -1040,7 +1040,7 @@ const Products = () => {
     if (!window.confirm("Delete this product?")) return;
     try {
       await axios.delete(
-        `https://buygoo-backend.onrender.com/api/v1/product/deletesingleproduct/${id}`,
+        `http://localhost:3000/api/v1/product/deletesingleproduct/${id}`,
       );
       toast.success("Product deleted!");
       triggerRefresh();
